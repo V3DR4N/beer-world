@@ -1,0 +1,38 @@
+[
+  {
+    "id": "de-wilde-hop",
+    "name": "De Wilde Hop",
+    "location": "Ghent, Belgium",
+    "founded": 2014,
+    "founders": ["Lena Vandermeersch", "Pieter Vandermeersch"],
+    "tagline": "Brewed wild. Drunk slowly.",
+    "styles": ["Saison", "Lambic", "Farmhouse Ale", "Sour"],
+    "moods": ["adventurous", "sophisticated", "special-occasion"],
+    "story": "Lena was a biology teacher fascinated by fermentation science, while Pieter was a carpenter with a passion for craft. In 2014, they converted an old garden shed behind their home into a makeshift brewery, starting with experimental batches of saison using wild yeast cultures Lena cultivated from local botanicals. Their breakthrough came when they embraced spontaneous fermentation, allowing the natural microflora of their Belgian region to guide each batch. Today, De Wilde Hop remains family-run, with a philosophy centered on respecting the terroir and unpredictability of wild fermentation. Every bottle tells a story of seasonal variation and microbial complexity.",
+    "imageUrl": "/images/breweries/1.jpg"
+  },
+  {
+    "id": "schwarzwald-brauhaus",
+    "name": "Schwarzwald Brauhaus",
+    "location": "Freiburg, Germany",
+    "founded": 2009,
+    "founders": ["Klaus Hoffmann"],
+    "tagline": "Ancient forest. Modern craft.",
+    "styles": ["Smoked Beer", "Dark Lager", "IPA", "Seasonal"],
+    "moods": ["sophisticated", "rich-and-complex"],
+    "story": "Klaus spent 30 years protecting the Black Forest before discovering his passion for brewing. In 2009, he established Schwarzwald Brauhaus with a mission to translate the forest's character into beer. His approach is deeply rooted in sustainability—he forages wild mushrooms, harvests fresh spruce tips in spring, and smokes malt over beechwood from sustainably managed groves. Each season brings different botanicals, reflecting the forest's natural rhythms. Klaus believes that great beer mirrors its environment, and his portfolio showcases how terroir influences flavor as much in brewing as in winemaking. The brewery has become a bridge between forestry traditions and modern craft beer culture.",
+    "imageUrl": "/images/breweries/2.jpg"
+  },
+  {
+    "id": "noorden-brewery",
+    "name": "Noorden Brewery",
+    "location": "Amsterdam, Netherlands",
+    "founded": 2018,
+    "founders": ["Sara Bakker", "Thijs de Groot"],
+    "tagline": "Clean lines. Big flavour.",
+    "styles": ["Pale Ale", "Session IPA", "Wheat Beer", "Stout"],
+    "moods": ["easy-drinking", "light-and-fruity", "everyday"],
+    "story": "Sara and Thijs met at an Amsterdam homebrew club in 2016, where they spent countless evenings debating flavor profiles, fermentation temperatures, and recipe design. Their heated discussions—playful arguments about hop selection and water chemistry—became the foundation of their brewing philosophy. In 2018, they turned their debates into reality, opening Noorden Brewery with a distinctly minimalist approach. Sara brings precision to design and visual identity, while Thijs applies rigorous chemical understanding to every step of production. Their beers are stripped down to essentials: pristine ingredients, precise control, and intentional flavor. They believe that great beer doesn't need complexity to be interesting—sometimes clarity and balance say more than a wall of flavors. Every recipe is debated, tested, and refined until it's as honest as their partnership.",
+    "imageUrl": "/images/breweries/3.jpg"
+  }
+]

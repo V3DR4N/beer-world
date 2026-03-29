@@ -1,0 +1,109 @@
+{
+  "questions": [
+    {
+      "id": "q1",
+      "question": "How are you feeling right now?",
+      "options": [
+        {
+          "text": "Light and easy",
+          "moods": ["easy-drinking", "light-and-fruity"]
+        },
+        {
+          "text": "Ready for something special",
+          "moods": ["sophisticated", "special-occasion"]
+        },
+        {
+          "text": "Curious and adventurous",
+          "moods": ["adventurous", "sophisticated"]
+        },
+        {
+          "text": "Just need a good beer",
+          "moods": ["easy-drinking", "everyday"]
+        }
+      ]
+    },
+    {
+      "id": "q2",
+      "question": "What sounds more appealing right now?",
+      "options": [
+        {
+          "text": "Something light and citrusy",
+          "moods": ["light-and-fruity", "easy-drinking"]
+        },
+        {
+          "text": "Something rich and complex",
+          "moods": ["rich-and-complex", "sophisticated"]
+        },
+        {
+          "text": "Something funky and sour",
+          "moods": ["adventurous", "sophisticated"]
+        },
+        {
+          "text": "Something smoky and deep",
+          "moods": ["rich-and-complex", "special-occasion"]
+        }
+      ]
+    },
+    {
+      "id": "q3",
+      "question": "Where are you drinking this?",
+      "options": [
+        {
+          "text": "Sofa film Sunday evening",
+          "moods": ["easy-drinking", "everyday"]
+        },
+        {
+          "text": "Dinner with people to impress",
+          "moods": ["sophisticated", "special-occasion"]
+        },
+        {
+          "text": "Outside sunshine good company",
+          "moods": ["light-and-fruity", "easy-drinking"]
+        },
+        {
+          "text": "Alone quietly paying attention",
+          "moods": ["adventurous", "sophisticated"]
+        }
+      ]
+    },
+    {
+      "id": "q4",
+      "question": "How do you feel about craft beer?",
+      "options": [
+        {
+          "text": "New to it show me where to start",
+          "moods": ["easy-drinking", "light-and-fruity"]
+        },
+        {
+          "text": "I know what I like",
+          "moods": ["easy-drinking", "everyday"]
+        },
+        {
+          "text": "I want to be surprised",
+          "moods": ["adventurous", "sophisticated"]
+        },
+        {
+          "text": "I take this seriously",
+          "moods": ["sophisticated", "rich-and-complex", "special-occasion"]
+        }
+      ]
+    }
+  ],
+  "profiles": [
+    {
+      "id": "explorer",
+      "name": "The Explorer",
+      "dominantMoods": ["adventurous", "sophisticated"]
+    },
+    {
+      "id": "easy-drinker",
+      "name": "Easy Drinker",
+      "dominantMoods": ["easy-drinking", "everyday", "light-and-fruity"]
+    },
+    {
+      "id": "connoisseur",
+      "name": "The Connoisseur",
+      "dominantMoods": ["sophisticated", "rich-and-complex", "special-occasion"]
+    }
+  ]
+}
