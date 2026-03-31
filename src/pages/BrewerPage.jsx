@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useBasket } from '../hooks/useBasket';
 import brewers from '../data/brewers.json';
 import beers from '../data/beers.json';
+import RatingDisplay from '../components/ui/RatingDisplay';
+import RatingInput from '../components/ui/RatingInput';
 
 const BREWER_COVER_IMAGES = {
   'de-wilde-hop': '/images/breweries/1.jpg',
@@ -23,6 +25,7 @@ export default function BrewerPage() {
   const [recentlyAddedBeers, setRecentlyAddedBeers] = useState(new Set());
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
+  const [copiedBrewerLink, setCopiedBrewerLink] = useState(false);
 
   // Check if coming from discover page
   const fromDiscover = searchParams.get('from') === 'discover';
@@ -38,13 +41,13 @@ export default function BrewerPage() {
     return beers.filter((b) => b.brewerId === brewerId);
   }, [brewerId]);
 
-  // Find the selected beer if coming from discover
+  // Find the selected beer (from either discover or clicking within brewery page)
   const selectedBeer = useMemo(() => {
-    if (fromDiscover && selectedBeerId) {
+    if (selectedBeerId) {
       return beers.find((b) => b.id === selectedBeerId);
     }
     return null;
-  }, [fromDiscover, selectedBeerId]);
+  }, [selectedBeerId]);
 
   if (!brewer) {
     return (
@@ -89,7 +92,7 @@ export default function BrewerPage() {
             cursor: 'pointer',
           }}
         >
-          Back to discovery
+          Back to Discover
         </button>
       </div>
     );
@@ -112,6 +115,11 @@ export default function BrewerPage() {
     }, 2000);
   };
 
+  const handleCopyBrewerLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopiedBrewerLink(true);
+    setTimeout(() => setCopiedBrewerLink(false), 2000);
+  };
 
   return (
     <motion.div
@@ -122,11 +130,9 @@ export default function BrewerPage() {
     >
       {/* Back Button */}
       <div style={{
-        position: 'absolute',
-        top: 'auto',
-        left: '180px',
+        position: 'relative',
         zIndex: 10,
-        marginTop: '2rem',
+        padding: '2rem 0 0 1rem',
       }}>
         <button
           onClick={() => navigate('/discover')}
@@ -154,7 +160,7 @@ export default function BrewerPage() {
             e.currentTarget.style.color = 'white';
           }}
         >
-          ← Back to discovery
+          ← Back to Discover
         </button>
       </div>
 
@@ -166,19 +172,31 @@ export default function BrewerPage() {
         style={{
           position: 'relative',
           width: '100%',
-          height: '40vh',
-          overflow: 'hidden',
+          height: 'clamp(25vh, 50vw, 40vh)',
+          overflow: 'visible',
         }}
       >
-        <img
-          src={coverImage}
-          alt={brewer.name}
+        <div
           style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
             width: '100%',
             height: '100%',
-            objectFit: 'cover',
+            overflow: 'hidden',
           }}
-        />
+        >
+          <img
+            src={coverImage}
+            alt={brewer.name}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              pointerEvents: 'none',
+            }}
+          />
+        </div>
 
         {/* Gradient overlay */}
         <div
@@ -198,30 +216,123 @@ export default function BrewerPage() {
           style={{
             position: 'absolute',
             bottom: '2rem',
-            left: '180px',
-            right: '2rem',
-            zIndex: 5,
+            left: 0,
+            right: 0,
+            zIndex: 20,
+            maxWidth: '1200px',
+            margin: '0 auto',
+            padding: '0 1rem',
           }}
         >
-          <h1 style={{
-            fontSize: '3rem',
-            fontFamily: 'Bebas Neue',
-            color: 'white',
-            margin: '0 0 0.5rem 0',
-            textTransform: 'uppercase',
-            letterSpacing: '2px',
-          }}>
-            {brewer.name}
-          </h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+            <h1 style={{
+              fontSize: 'clamp(1.75rem, 8vw, 3rem)',
+              fontFamily: 'Bebas Neue',
+              color: 'white',
+              margin: 0,
+              textTransform: 'uppercase',
+              letterSpacing: '2px',
+            }}>
+              {brewer.name}
+            </h1>
 
-          <p style={{
-            fontSize: '1.125rem',
-            fontFamily: 'DM Sans',
-            color: 'rgba(255, 255, 255, 0.7)',
-            margin: '0 0 1rem 0',
+          </div>
+
+          {/* Share Section */}
+          <div style={{
+            display: 'flex',
+            gap: '1rem',
+            justifyContent: 'flex-start',
+            flexWrap: 'wrap',
+            marginBottom: '1rem',
           }}>
-            {brewer.tagline}
-          </p>
+            {/* WhatsApp Button */}
+            <a
+              href={`https://wa.me/?text=Check out ${brewer.name} on Beer World 🍺 beerworld.com`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                color: 'white',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                padding: '0.5rem 1rem',
+                borderRadius: '6px',
+                fontSize: '0.9rem',
+                fontFamily: 'DM Sans',
+                fontWeight: '600',
+                textDecoration: 'none',
+                cursor: 'pointer',
+                transition: 'all 200ms ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+              }}
+            >
+              WhatsApp
+            </a>
+
+            {/* Twitter Button */}
+            <a
+              href={`https://twitter.com/intent/tweet?text=Check out ${brewer.name} on Beer World 🍺 beerworld.com`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                color: 'white',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                padding: '0.5rem 1rem',
+                borderRadius: '6px',
+                fontSize: '0.9rem',
+                fontFamily: 'DM Sans',
+                fontWeight: '600',
+                textDecoration: 'none',
+                cursor: 'pointer',
+                transition: 'all 200ms ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+              }}
+            >
+              X / Twitter
+            </a>
+
+            {/* Copy Link Button */}
+            <button
+              onClick={handleCopyBrewerLink}
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                color: 'white',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                padding: '0.5rem 1rem',
+                borderRadius: '6px',
+                fontSize: '0.9rem',
+                fontFamily: 'DM Sans',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 200ms ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+              }}
+            >
+              {copiedBrewerLink ? 'Copied!' : 'Copy Link'}
+            </button>
+          </div>
 
           <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
             <span style={{
@@ -246,14 +357,14 @@ export default function BrewerPage() {
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '0 2rem',
+        padding: '0 1rem',
         position: 'relative',
         zIndex: 10,
       }}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '3rem',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+          gap: '2rem',
           alignItems: 'start',
           marginTop: '-120px',
         }}>
@@ -262,7 +373,7 @@ export default function BrewerPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            style={{ paddingTop: '200px' }}
+            style={{ paddingTop: 'clamp(100px, 20vw, 200px)' }}
           >
             {/* Story */}
             <div style={{ marginBottom: '3rem' }}>
@@ -275,7 +386,7 @@ export default function BrewerPage() {
                 marginBottom: '1rem',
                 display: 'block',
               }}>
-                Their story
+                Story
               </span>
 
               <p style={{
@@ -307,7 +418,7 @@ export default function BrewerPage() {
                 marginBottom: '1rem',
                 display: 'block',
               }}>
-                Our philosophy
+                Philosophy
               </span>
 
               <p style={{
@@ -333,9 +444,10 @@ export default function BrewerPage() {
               border: '1px solid var(--border-subtle)',
               borderRadius: '12px',
               padding: '2rem',
+              overflow: 'hidden',
             }}
           >
-            {fromDiscover && selectedBeer ? (
+            {selectedBeer ? (
               <>
                 {/* Beer Image */}
                 <div style={{
@@ -343,9 +455,9 @@ export default function BrewerPage() {
                   paddingBottom: '56.25%',
                   position: 'relative',
                   backgroundColor: 'var(--background-tertiary)',
-                  borderRadius: '8px',
+                  borderRadius: '8px 8px 0 0',
                   overflow: 'hidden',
-                  marginBottom: '1.5rem',
+                  marginBottom: 0,
                 }}>
                   {failedImages.has(selectedBeer.id) ? (
                     <div style={{
@@ -390,7 +502,7 @@ export default function BrewerPage() {
                 </div>
 
                 {/* Beer Information */}
-                <div style={{ marginBottom: '1.5rem' }}>
+                <div style={{ marginBottom: '1.5rem', paddingTop: '1.5rem' }}>
                   <p style={{
                     fontSize: '0.875rem',
                     fontFamily: 'DM Sans',
@@ -410,6 +522,26 @@ export default function BrewerPage() {
                   </p>
                 </div>
 
+                {/* Description */}
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <p style={{
+                    fontSize: '1rem',
+                    fontFamily: 'DM Sans',
+                    color: 'var(--text-secondary)',
+                    margin: 0,
+                    lineHeight: 1.6,
+                  }}>
+                    {selectedBeer.humanDescription}
+                  </p>
+                </div>
+
+                {/* Divider */}
+                <div style={{
+                  height: '1px',
+                  backgroundColor: 'var(--border-subtle)',
+                  margin: '2rem 0',
+                }} />
+
                 {/* Style */}
                 <div style={{ marginBottom: '1.5rem' }}>
                   <p style={{
@@ -418,16 +550,27 @@ export default function BrewerPage() {
                     color: 'var(--text-muted)',
                     margin: '0 0 0.5rem 0',
                     textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
                   }}>
-                    Style
+                    Beer Style
                   </p>
                   <p style={{
-                    fontSize: '1.125rem',
-                    fontFamily: 'DM Sans',
-                    color: 'var(--text-primary)',
+                    fontSize: '1.25rem',
+                    fontFamily: 'Bebas Neue',
+                    color: 'var(--accent-amber)',
                     margin: 0,
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
                   }}>
                     {selectedBeer.style}
+                  </p>
+                  <p style={{
+                    fontSize: '0.9rem',
+                    fontFamily: 'DM Sans',
+                    color: 'var(--text-secondary)',
+                    margin: '0.5rem 0 0 0',
+                  }}>
+                    A distinct category of beer with unique characteristics and flavor profiles
                   </p>
                 </div>
 
@@ -501,6 +644,15 @@ export default function BrewerPage() {
                       </span>
                     ))}
                   </div>
+                </div>
+
+                {/* Rating Input */}
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <RatingInput
+                    beerId={selectedBeer.id}
+                    averageRating={selectedBeer.averageRating}
+                    ratingCount={selectedBeer.ratingCount}
+                  />
                 </div>
 
                 {/* Add to Cart Button */}
@@ -581,7 +733,7 @@ export default function BrewerPage() {
                   </p>
                 </div>
 
-                {/* Team */}
+                {/* Founded By */}
                 <div style={{ marginBottom: '1.5rem' }}>
                   <p style={{
                     fontSize: '0.875rem',
@@ -589,7 +741,7 @@ export default function BrewerPage() {
                     color: 'var(--text-muted)',
                     margin: '0 0 0.5rem 0',
                   }}>
-                    Team
+                    Founded By
                   </p>
                   <p style={{
                     fontSize: '1.125rem',
@@ -597,7 +749,7 @@ export default function BrewerPage() {
                     color: 'var(--text-primary)',
                     margin: 0,
                   }}>
-                    {brewer.founders.length} {brewer.founders.length === 1 ? 'founder' : 'founders'}
+                    {brewer.founders.join(brewer.founders.length === 2 ? ' & ' : ', ')}
                   </p>
                 </div>
 
@@ -629,6 +781,46 @@ export default function BrewerPage() {
                     ))}
                   </div>
                 </div>
+
+                {/* Awards */}
+                {brewer.awards && brewer.awards.length > 0 && (
+                  <div style={{ marginBottom: '1.5rem' }}>
+                    <p style={{
+                      fontSize: '0.75rem',
+                      fontFamily: 'Bebas Neue',
+                      color: 'var(--accent-amber)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                      margin: '0 0 0.75rem 0',
+                    }}>
+                      Awards
+                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      {brewer.awards.map((award) => (
+                        <div
+                          key={award}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'flex-start',
+                            gap: '0.75rem',
+                            fontSize: '0.95rem',
+                            fontFamily: 'DM Sans',
+                            color: 'var(--text-primary)',
+                          }}
+                        >
+                          <span style={{
+                            color: 'var(--accent-amber)',
+                            marginTop: '0.25rem',
+                            flexShrink: 0,
+                          }}>
+                            •
+                          </span>
+                          <span>{award}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </>
             )}
           </motion.div>
@@ -655,7 +847,7 @@ export default function BrewerPage() {
           textTransform: 'uppercase',
           letterSpacing: '1px',
         }}>
-          Their beers
+          Beers
         </h2>
 
         <motion.div
@@ -770,6 +962,13 @@ export default function BrewerPage() {
                 }}>
                   {beer.name}
                 </h3>
+
+                {/* Rating */}
+                <RatingDisplay
+                  averageRating={beer.averageRating}
+                  ratingCount={beer.ratingCount}
+                  size="small"
+                />
 
                 {/* Style badge */}
                 <span style={{

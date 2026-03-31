@@ -237,6 +237,50 @@ export default function Footer() {
             </li>
           </ul>
         </div>
+
+        {/* Brewer Portal */}
+        <div>
+          <p style={{
+            fontSize: '0.75rem',
+            fontFamily: 'Bebas Neue',
+            color: 'var(--text-secondary)',
+            margin: '0 0 0.75rem 0',
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
+          }}>
+            Brewer Portal
+          </p>
+          <a href="/brewer-portal" style={{
+            fontSize: '0.875rem',
+            fontFamily: 'DM Sans',
+            color: 'var(--text-secondary)',
+            textDecoration: 'none',
+          }}>
+            Brewer Login
+          </a>
+        </div>
+
+        {/* Admin */}
+        <div>
+          <p style={{
+            fontSize: '0.75rem',
+            fontFamily: 'Bebas Neue',
+            color: 'var(--text-secondary)',
+            margin: '0 0 0.75rem 0',
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
+          }}>
+            Admin
+          </p>
+          <a href="/admin" style={{
+            fontSize: '0.875rem',
+            fontFamily: 'DM Sans',
+            color: 'var(--text-secondary)',
+            textDecoration: 'none',
+          }}>
+            Admin Panel
+          </a>
+        </div>
       </div>
 
       {/* Bottom Section */}

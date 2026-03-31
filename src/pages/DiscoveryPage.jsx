@@ -5,7 +5,9 @@ import Cookies from 'js-cookie';
 import { useBasket } from '../hooks/useBasket';
 import beers from '../data/beers.json';
 import brewers from '../data/brewers.json';
+import quizConfig from '../data/quizConfig.json';
 import SearchBar from '../components/ui/SearchBar';
+import RatingDisplay from '../components/ui/RatingDisplay';
 
 
 const MOOD_LABELS = {
@@ -34,6 +36,8 @@ export default function DiscoveryPage() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [selectedMood, setSelectedMood] = useState(null);
   const [profileName, setProfileName] = useState('Friend');
+  const [profileId, setProfileId] = useState(null);
+  const [hasQuizProfile, setHasQuizProfile] = useState(false);
   const [failedImages, setFailedImages] = useState(new Set());
   const [recentlyAddedBeers, setRecentlyAddedBeers] = useState(new Set());
   const [showNotification, setShowNotification] = useState(false);
@@ -46,9 +50,14 @@ export default function DiscoveryPage() {
       try {
         const profile = JSON.parse(profileCookie);
         setProfileName(profile.name);
+        setProfileId(profile.id);
+        setHasQuizProfile(true);
       } catch (e) {
         console.error('Error parsing profile cookie:', e);
+        setHasQuizProfile(false);
       }
+    } else {
+      setHasQuizProfile(false);
     }
   }, []);
 
@@ -165,7 +174,7 @@ export default function DiscoveryPage() {
       <motion.section
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.4 }}
         style={{
           padding: '3rem 2rem',
           backgroundColor: 'var(--background-secondary)',
@@ -173,33 +182,101 @@ export default function DiscoveryPage() {
         }}
       >
         <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
-          {/* Beer World Brand */}
-          <h1 style={{
-            fontSize: '2.75rem',
-            fontFamily: 'Bebas Neue',
-            color: 'var(--accent-amber)',
-            margin: '0 0 1rem 0',
-            textTransform: 'uppercase',
-            letterSpacing: '2px',
-          }}>
-            {profileName !== 'Friend' ? profileName : 'Beer World'}
-          </h1>
+          {/* STATE 1: No Quiz Taken */}
+          {!hasQuizProfile ? (
+            <>
+              {/* Heading */}
+              <h1 style={{
+                fontSize: '2.75rem',
+                fontFamily: 'Bebas Neue',
+                color: 'var(--accent-amber)',
+                margin: '0 0 1rem 0',
+                textTransform: 'uppercase',
+                letterSpacing: '2px',
+              }}>
+                Welcome to Beer World
+              </h1>
 
-          {/* Personalized Greeting */}
-          <p style={{
-            fontSize: '1.125rem',
-            fontFamily: 'DM Sans',
-            color: 'var(--accent-cream)',
-            margin: '0 0 1rem 0',
-          }}>
-            {profileName !== 'Friend'
-              ? "Let's find your next favorite"
-              : 'Discover the world of craft beer.'}
-          </p>
+              {/* Subtitle */}
+              <p style={{
+                fontSize: '1.125rem',
+                fontFamily: 'DM Sans',
+                color: 'var(--accent-cream)',
+                margin: '0 0 2rem 0',
+              }}>
+                Discover the world of craft beer.
+              </p>
 
-          {/* Retake Quiz Button */}
-          {profileName !== 'Friend' && (
-            <div style={{ marginBottom: '1.5rem' }}>
+              {/* Quiz Invitation Block */}
+              <div style={{
+                borderTop: '1px solid var(--border-subtle)',
+                paddingTop: '2rem',
+                marginTop: '1rem',
+              }}>
+                <p style={{
+                  fontSize: '0.875rem',
+                  fontFamily: 'DM Sans',
+                  color: 'var(--text-secondary)',
+                  margin: '0 0 1rem 0',
+                }}>
+                  Not sure where to start?
+                </p>
+
+                <button
+                  onClick={() => navigate('/quiz')}
+                  style={{
+                    backgroundColor: 'var(--accent-amber)',
+                    color: 'var(--background-primary)',
+                    border: 'none',
+                    padding: '12px 24px',
+                    fontSize: '0.95rem',
+                    fontFamily: 'Bebas Neue',
+                    fontWeight: '600',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    transition: 'all 200ms ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(232, 146, 10, 0.3)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  Tailor your discovery — take the taste quiz →
+                </button>
+              </div>
+            </>
+          ) : (
+            /* STATE 2: Quiz Taken */
+            <>
+              {/* Heading */}
+              <h1 style={{
+                fontSize: '2.75rem',
+                fontFamily: 'Bebas Neue',
+                color: 'var(--accent-amber)',
+                margin: '0 0 1rem 0',
+                textTransform: 'uppercase',
+                letterSpacing: '2px',
+              }}>
+                Welcome back, {profileName}.
+              </h1>
+
+              {/* Subtitle */}
+              <p style={{
+                fontSize: '1.125rem',
+                fontFamily: 'DM Sans',
+                color: 'var(--accent-cream)',
+                margin: '0 0 1.5rem 0',
+              }}>
+                Your picks, based on your taste profile.
+              </p>
+
+              {/* Retake Quiz Link */}
               <a
                 href="#"
                 onClick={(e) => {
@@ -213,13 +290,21 @@ export default function DiscoveryPage() {
                   textDecoration: 'none',
                   borderBottom: '1px solid var(--text-muted)',
                   cursor: 'pointer',
+                  transition: 'all 200ms ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = 'var(--accent-amber)';
+                  e.currentTarget.style.borderBottomColor = 'var(--accent-amber)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = 'var(--text-muted)';
+                  e.currentTarget.style.borderBottomColor = 'var(--text-muted)';
                 }}
               >
-                Retake the quiz
+                Not feeling these? Retake the quiz →
               </a>
-            </div>
+            </>
           )}
-
         </div>
       </motion.section>
 
@@ -482,6 +567,13 @@ export default function DiscoveryPage() {
                       }}>
                         {beer.name}
                       </h3>
+
+                      {/* Rating */}
+                      <RatingDisplay
+                        averageRating={beer.averageRating}
+                        ratingCount={beer.ratingCount}
+                        size="small"
+                      />
 
                       {/* Style badge */}
                       <span style={{

@@ -104,6 +104,10 @@ export default function QuizPage() {
     }
   };
 
+  const handleCancel = () => {
+    navigate('/discover');
+  };
+
   const handleDiscoverClick = () => {
     // Save profile to cookie
     saveProfile({ id: selectedProfile.id, name: selectedProfile.name });
@@ -293,9 +297,9 @@ export default function QuizPage() {
           transition={{ duration: 0.3, delay: 0.1 }}
           style={{
             width: '100%',
-            maxWidth: '800px',
+            maxWidth: '1000px',
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gridTemplateColumns: 'repeat(4, 1fr)',
             gap: '1rem',
             marginBottom: '2rem',
           }}
@@ -344,12 +348,43 @@ export default function QuizPage() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Back Button */}
-      {currentQuestion > 0 && (
+      {/* Button Group */}
+      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+        {/* Back Button */}
+        {currentQuestion > 0 && (
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            onClick={handleBack}
+            style={{
+              backgroundColor: 'transparent',
+              color: 'var(--text-secondary)',
+              border: '1px solid var(--border-medium)',
+              padding: '0.75rem 1.5rem',
+              fontSize: '0.95rem',
+              fontFamily: 'DM Sans',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              transition: 'all 200ms ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--accent-amber)';
+              e.currentTarget.style.color = 'var(--accent-amber)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border-medium)';
+              e.currentTarget.style.color = 'var(--text-secondary)';
+            }}
+          >
+            ← Back
+          </motion.button>
+        )}
+
+        {/* Cancel Button */}
         <motion.button
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          onClick={handleBack}
+          onClick={handleCancel}
           style={{
             backgroundColor: 'transparent',
             color: 'var(--text-secondary)',
@@ -362,17 +397,17 @@ export default function QuizPage() {
             transition: 'all 200ms ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'var(--accent-amber)';
-            e.currentTarget.style.color = 'var(--accent-amber)';
+            e.currentTarget.style.borderColor = 'var(--text-secondary)';
+            e.currentTarget.style.color = 'var(--text-secondary)';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.borderColor = 'var(--border-medium)';
             e.currentTarget.style.color = 'var(--text-secondary)';
           }}
         >
-          ← Back
+          ✕ Cancel
         </motion.button>
-      )}
+      </div>
     </div>
   );
 }

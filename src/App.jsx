@@ -1,34 +1,102 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { ThemeProvider } from './context/ThemeContext';
 import { PreferencesProvider } from './context/PreferencesContext';
 import { BasketProvider } from './context/BasketContext';
+import { BrewerSessionProvider } from './context/BrewerSessionContext';
+import { AdminSessionProvider } from './context/AdminSessionContext';
 
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
+import DemoControls from './components/dev/DemoControls';
+import ZendeskWidget from './components/support/ZendeskWidget';
 import QuizPage from './pages/QuizPage';
 import DiscoveryPage from './pages/DiscoveryPage';
 import BrewerPage from './pages/BrewerPage';
 import BrewersListPage from './pages/BrewersListPage';
 import CheckoutPage from './pages/CheckoutPage';
 import AboutPage from './pages/AboutPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import BrewerPortalLoginPage from './pages/BrewerPortalLoginPage';
+import BrewerPortalDashboard from './pages/BrewerPortalDashboard';
+import AdminLoginPage from './pages/AdminLoginPage';
+import AdminPage from './pages/AdminPage';
+
+// Route guard for brewer portal
+function BrewerSessionRequired({ children }) {
+  const location = useLocation();
+  const sessionStr = localStorage.getItem('beerworld_brewer_session');
+  const session = sessionStr ? JSON.parse(sessionStr) : null;
+
+  if (!session?.isLoggedIn) {
+    return <Navigate to="/brewer-portal" replace />;
+  }
+
+  return children;
+}
+
+// Route guard for admin portal
+function AdminSessionRequired({ children }) {
+  const location = useLocation();
+  const sessionStr = localStorage.getItem('beerworld_admin_session');
+  const session = sessionStr ? JSON.parse(sessionStr) : null;
+
+  if (!session?.isLoggedIn) {
+    return <Navigate to="/admin" replace />;
+  }
+
+  return children;
+}
 
 function AppContent() {
   const location = useLocation();
-  const hideHeader = location.pathname === '/quiz';
+  const isBrewerPortal = location.pathname.startsWith('/brewer-portal');
+  const isAdmin = location.pathname === '/admin';
+  const hideHeader = location.pathname === '/quiz' || location.pathname === '/login' || location.pathname === '/register' || isBrewerPortal || isAdmin;
+
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   return (
     <>
       {!hideHeader && <Header />}
-      <Routes>
-        <Route path="/" element={<Navigate to="/discover" replace />} />
-        <Route path="/quiz" element={<QuizPage />} />
-        <Route path="/discover" element={<DiscoveryPage />} />
-        <Route path="/breweries" element={<BrewersListPage />} />
-        <Route path="/brewer/:id" element={<BrewerPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/about" element={<AboutPage />} />
-      </Routes>
-      {!hideHeader && <Footer />}
+      <div style={{ paddingTop: !hideHeader ? '80px' : '0' }}>
+        <Routes>
+          <Route path="/" element={<Navigate to="/discover" replace />} />
+          <Route path="/quiz" element={<QuizPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/discover" element={<DiscoveryPage />} />
+          <Route path="/breweries" element={<BrewersListPage />} />
+          <Route path="/brewer/:id" element={<BrewerPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/brewer-portal" element={<BrewerPortalLoginPage />} />
+          <Route
+            path="/brewer-portal/dashboard"
+            element={
+              <BrewerSessionRequired>
+                <BrewerPortalDashboard />
+              </BrewerSessionRequired>
+            }
+          />
+          <Route path="/admin" element={<AdminLoginPage />} />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <AdminSessionRequired>
+                <AdminPage />
+              </AdminSessionRequired>
+            }
+          />
+        </Routes>
+        {!hideHeader && <Footer />}
+      </div>
+      <DemoControls />
+      <ZendeskWidget />
     </>
   );
 }
@@ -37,11 +105,15 @@ export default function App() {
   return (
     <BrowserRouter>
       <ThemeProvider>
-        <PreferencesProvider>
-          <BasketProvider>
-            <AppContent />
-          </BasketProvider>
-        </PreferencesProvider>
+        <BrewerSessionProvider>
+          <AdminSessionProvider>
+            <PreferencesProvider>
+              <BasketProvider>
+                <AppContent />
+              </BasketProvider>
+            </PreferencesProvider>
+          </AdminSessionProvider>
+        </BrewerSessionProvider>
       </ThemeProvider>
     </BrowserRouter>
   );

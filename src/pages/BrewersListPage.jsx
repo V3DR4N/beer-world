@@ -56,6 +56,7 @@ export default function BrewersListPage() {
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
               gap: '2rem',
+              alignItems: 'stretch',
             }}
           >
             {brewers.map((brewer, index) => (
@@ -72,6 +73,9 @@ export default function BrewersListPage() {
                   overflow: 'hidden',
                   cursor: 'pointer',
                   transition: 'all 200ms ease',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: '100%',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = 'var(--accent-amber)';
@@ -109,7 +113,12 @@ export default function BrewersListPage() {
                 </div>
 
                 {/* Content */}
-                <div style={{ padding: '1.5rem' }}>
+                <div style={{
+                  padding: '1.5rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flex: 1,
+                }}>
                   <h3 style={{
                     fontSize: '1.5rem',
                     fontFamily: 'Bebas Neue',
@@ -137,6 +146,7 @@ export default function BrewersListPage() {
                     color: 'var(--text-secondary)',
                     margin: '0 0 1rem 0',
                     lineHeight: 1.6,
+                    flex: 1,
                   }}>
                     {brewer.tagline}
                   </p>
@@ -190,6 +200,7 @@ export default function BrewersListPage() {
                       fontWeight: '600',
                       cursor: 'pointer',
                       transition: 'all 200ms ease',
+                      marginTop: 'auto',
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor = 'var(--accent-amber-light)';

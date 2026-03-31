@@ -76,6 +76,13 @@ export default function CheckoutPage() {
   const [deliveryNote, setDeliveryNote] = useState('');
   const [ageConfirmed, setAgeConfirmed] = useState(false);
 
+  // Payment form state
+  const [cardNumber, setCardNumber] = useState('');
+  const [expiryDate, setExpiryDate] = useState('');
+  const [cvv, setCvv] = useState('');
+  const [paymentErrors, setPaymentErrors] = useState({});
+  const [copiedToClipboard, setCopiedToClipboard] = useState(false);
+
   const discountPercent = promoApplied ? 15 : 0;
   const subtotal = total;
   const discount = subtotal * (discountPercent / 100);
@@ -99,11 +106,38 @@ export default function CheckoutPage() {
   };
 
   const handleDeliverySubmit = () => {
+    if (!validatePaymentDetails()) {
+      return;
+    }
+
     if (firstName && lastName && email && address1 && city && postcode && ageConfirmed) {
       const num = Math.floor(Math.random() * 9000) + 1000;
       setOrderNumber(`#BW-${num}`);
       setDeliveryAddress(`${address1}${address2 ? ', ' + address2 : ''}, ${city} ${postcode}, ${country}`);
       setStage('confirmation');
+
+      // Store user account if not already exists
+      if (password && !localStorage.getItem('beerworld_user')) {
+        const newUser = {
+          firstName,
+          lastName,
+          email,
+          password,
+        };
+        localStorage.setItem('beerworld_user', JSON.stringify(newUser));
+      }
+
+      // Store session
+      localStorage.setItem(
+        'beerworld_session',
+        JSON.stringify({
+          firstName,
+          email,
+        })
+      );
+
+      // Clear basket on successful order
+      clearBasket();
 
       // Trigger confetti
       setTimeout(() => {
@@ -121,6 +155,64 @@ export default function CheckoutPage() {
   const handleContinueDiscovering = () => {
     clearBasket();
     navigate('/discover');
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText('https://beerworld.com');
+    setCopiedToClipboard(true);
+    setTimeout(() => setCopiedToClipboard(false), 2000);
+  };
+
+  // Payment formatting functions
+  const formatCardNumber = (value) => {
+    const cleaned = value.replace(/\s/g, '');
+    const formatted = cleaned.replace(/(\d{4})/g, '$1 ').trim();
+    return formatted.slice(0, 19);
+  };
+
+  const formatExpiryDate = (value) => {
+    const cleaned = value.replace(/\D/g, '');
+    if (cleaned.length >= 2) {
+      return cleaned.slice(0, 2) + ' / ' + cleaned.slice(2, 4);
+    }
+    return cleaned;
+  };
+
+  const validatePaymentDetails = () => {
+    const errors = {};
+
+    // Card number validation (16 digits)
+    const cardDigits = cardNumber.replace(/\s/g, '');
+    if (!cardDigits || cardDigits.length !== 16 || !/^\d+$/.test(cardDigits)) {
+      errors.cardNumber = 'Card number must be 16 digits';
+    }
+
+    // Expiry validation (MM/YY format and not in the past)
+    const expiryRegex = /^(\d{2}) \/ (\d{2})$/;
+    const expiryMatch = expiryDate.match(expiryRegex);
+    if (!expiryMatch) {
+      errors.expiryDate = 'Expiry must be in MM / YY format';
+    } else {
+      const month = parseInt(expiryMatch[1]);
+      const year = parseInt(expiryMatch[2]);
+      const now = new Date();
+      const currentYear = now.getFullYear() % 100;
+      const currentMonth = now.getMonth() + 1;
+
+      if (month < 1 || month > 12) {
+        errors.expiryDate = 'Month must be 01-12';
+      } else if (year < currentYear || (year === currentYear && month < currentMonth)) {
+        errors.expiryDate = 'Card has expired';
+      }
+    }
+
+    // CVV validation (3 digits)
+    if (!cvv || cvv.length !== 3 || !/^\d+$/.test(cvv)) {
+      errors.cvv = 'CVV must be 3 digits';
+    }
+
+    setPaymentErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const getBrewerName = (beerId) => {
@@ -320,6 +412,116 @@ export default function CheckoutPage() {
                 </p>
               </div>
             )}
+
+            {/* Social Sharing Section */}
+            <div style={{
+              marginBottom: '2rem',
+            }}>
+              <h3 style={{
+                fontSize: '1.25rem',
+                fontFamily: 'Bebas Neue',
+                color: 'var(--text-primary)',
+                margin: '0 0 1.5rem 0',
+                textTransform: 'uppercase',
+                letterSpacing: '1px',
+              }}>
+                Tell your friends what's on the way 🍺
+              </h3>
+
+              <div style={{
+                display: 'flex',
+                gap: '1rem',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+              }}>
+                {/* WhatsApp Button */}
+                <a
+                  href="https://wa.me/?text=Just ordered some incredible craft beer from Beer World. Discover yours at beerworld.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    backgroundColor: 'var(--background-secondary)',
+                    color: 'var(--text-primary)',
+                    border: '1px solid var(--border-medium)',
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '6px',
+                    fontSize: '0.95rem',
+                    fontFamily: 'DM Sans',
+                    fontWeight: '600',
+                    textDecoration: 'none',
+                    cursor: 'pointer',
+                    transition: 'all 200ms ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--accent-amber)';
+                    e.currentTarget.style.color = 'var(--background-primary)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--background-secondary)';
+                    e.currentTarget.style.color = 'var(--text-primary)';
+                  }}
+                >
+                  WhatsApp
+                </a>
+
+                {/* Twitter Button */}
+                <a
+                  href="https://twitter.com/intent/tweet?text=Just ordered some incredible craft beer from Beer World 🍺 Discover yours at beerworld.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    backgroundColor: 'var(--background-secondary)',
+                    color: 'var(--text-primary)',
+                    border: '1px solid var(--border-medium)',
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '6px',
+                    fontSize: '0.95rem',
+                    fontFamily: 'DM Sans',
+                    fontWeight: '600',
+                    textDecoration: 'none',
+                    cursor: 'pointer',
+                    transition: 'all 200ms ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--accent-amber)';
+                    e.currentTarget.style.color = 'var(--background-primary)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--background-secondary)';
+                    e.currentTarget.style.color = 'var(--text-primary)';
+                  }}
+                >
+                  X / Twitter
+                </a>
+
+                {/* Copy Link Button */}
+                <button
+                  onClick={handleCopyLink}
+                  style={{
+                    backgroundColor: 'var(--background-secondary)',
+                    color: 'var(--text-primary)',
+                    border: '1px solid var(--border-medium)',
+                    padding: '0.75rem 1.5rem',
+                    borderRadius: '6px',
+                    fontSize: '0.95rem',
+                    fontFamily: 'DM Sans',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 200ms ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--accent-amber)';
+                    e.currentTarget.style.color = 'var(--background-primary)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--background-secondary)';
+                    e.currentTarget.style.color = 'var(--text-primary)';
+                  }}
+                >
+                  {copiedToClipboard ? 'Copied!' : 'Copy Link'}
+                </button>
+              </div>
+            </div>
 
             {/* CTA */}
             <motion.button
@@ -741,23 +943,62 @@ export default function CheckoutPage() {
                 </button>
               </div>
 
+              {/* Consent Checkbox */}
+              <div style={{
+                display: 'flex',
+                gap: '0.75rem',
+                alignItems: 'flex-start',
+                marginBottom: '1.5rem',
+                padding: '1rem',
+                backgroundColor: 'var(--background-tertiary)',
+                borderRadius: '8px',
+                border: '1px solid var(--border-subtle)',
+              }}>
+                <input
+                  type="checkbox"
+                  id="age-consent"
+                  checked={ageConfirmed}
+                  onChange={(e) => setAgeConfirmed(e.target.checked)}
+                  style={{
+                    marginTop: '0.25rem',
+                    cursor: 'pointer',
+                    width: '18px',
+                    height: '18px',
+                    accentColor: 'var(--accent-amber)',
+                    flexShrink: 0,
+                  }}
+                />
+                <label
+                  htmlFor="age-consent"
+                  style={{
+                    fontSize: '0.875rem',
+                    fontFamily: 'DM Sans',
+                    color: 'var(--text-secondary)',
+                    cursor: 'pointer',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  I agree to the Terms of Service and Privacy Policy, and I certify that I am at least 18 years of age.
+                </label>
+              </div>
+
               {/* Create Account */}
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleAccountSubmit(false)}
-                disabled={!email || !password}
+                disabled={!email || !password || !ageConfirmed}
                 style={{
                   width: '100%',
-                  backgroundColor: email && password ? 'var(--accent-amber)' : 'var(--background-tertiary)',
-                  color: email && password ? 'var(--background-primary)' : 'var(--text-muted)',
+                  backgroundColor: email && password && ageConfirmed ? 'var(--accent-amber)' : 'var(--background-tertiary)',
+                  color: email && password && ageConfirmed ? 'var(--background-primary)' : 'var(--text-muted)',
                   border: 'none',
                   padding: '1rem',
                   fontSize: '1rem',
                   fontFamily: 'Bebas Neue',
                   fontWeight: '700',
                   borderRadius: '6px',
-                  cursor: email && password ? 'pointer' : 'not-allowed',
+                  cursor: email && password && ageConfirmed ? 'pointer' : 'not-allowed',
                   textTransform: 'uppercase',
                   letterSpacing: '1px',
                   marginBottom: '1.5rem',
@@ -1175,24 +1416,244 @@ export default function CheckoutPage() {
                   color: 'var(--text-primary)',
                   cursor: 'pointer',
                 }}>
-                  I confirm I am 18 or older. By placing this order I agree to Beer World terms.
+                  I agree to the Terms of Service and Privacy Policy, and I certify that I am at least 18 years of age.
                 </label>
+              </div>
+
+              {/* Payment Details Section */}
+              <div style={{ marginBottom: '2rem', paddingTop: '2rem', borderTop: '1px solid var(--border-subtle)' }}>
+                <h3 style={{
+                  fontSize: '1.25rem',
+                  fontFamily: 'Bebas Neue',
+                  color: 'var(--text-primary)',
+                  margin: '0 0 1.5rem 0',
+                  textTransform: 'uppercase',
+                }}>
+                  Payment Details
+                </h3>
+
+                {/* Card Number */}
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{
+                    display: 'block',
+                    fontSize: '0.875rem',
+                    fontFamily: 'DM Sans',
+                    color: 'var(--text-secondary)',
+                    marginBottom: '0.5rem',
+                  }}>
+                    Card number
+                  </label>
+                  <input
+                    type="text"
+                    value={cardNumber}
+                    onChange={(e) => {
+                      setCardNumber(formatCardNumber(e.target.value));
+                      if (paymentErrors.cardNumber) {
+                        setPaymentErrors({ ...paymentErrors, cardNumber: '' });
+                      }
+                    }}
+                    placeholder="1234 5678 9012 3456"
+                    maxLength="19"
+                    style={{
+                      width: '100%',
+                      backgroundColor: 'var(--background-tertiary)',
+                      border: paymentErrors.cardNumber ? '1px solid var(--error)' : '1px solid var(--border-medium)',
+                      color: 'var(--text-primary)',
+                      padding: '1rem',
+                      fontSize: '1rem',
+                      fontFamily: 'DM Sans',
+                      borderRadius: '12px',
+                      boxSizing: 'border-box',
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = paymentErrors.cardNumber ? 'var(--error)' : 'var(--accent-amber)'}
+                    onBlur={(e) => e.target.style.borderColor = paymentErrors.cardNumber ? 'var(--error)' : 'var(--border-medium)'}
+                  />
+                  {paymentErrors.cardNumber && (
+                    <p style={{
+                      fontSize: '0.75rem',
+                      fontFamily: 'DM Sans',
+                      color: 'var(--error)',
+                      margin: '0.5rem 0 0 0',
+                    }}>
+                      {paymentErrors.cardNumber}
+                    </p>
+                  )}
+                </div>
+
+                {/* Expiry + CVV */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '0.875rem',
+                      fontFamily: 'DM Sans',
+                      color: 'var(--text-secondary)',
+                      marginBottom: '0.5rem',
+                    }}>
+                      Expiry date
+                    </label>
+                    <input
+                      type="text"
+                      value={expiryDate}
+                      onChange={(e) => {
+                        setExpiryDate(formatExpiryDate(e.target.value));
+                        if (paymentErrors.expiryDate) {
+                          setPaymentErrors({ ...paymentErrors, expiryDate: '' });
+                        }
+                      }}
+                      placeholder="MM / YY"
+                      maxLength="7"
+                      style={{
+                        width: '100%',
+                        backgroundColor: 'var(--background-tertiary)',
+                        border: paymentErrors.expiryDate ? '1px solid var(--error)' : '1px solid var(--border-medium)',
+                        color: 'var(--text-primary)',
+                        padding: '1rem',
+                        fontSize: '1rem',
+                        fontFamily: 'DM Sans',
+                        borderRadius: '12px',
+                        boxSizing: 'border-box',
+                      }}
+                      onFocus={(e) => e.target.style.borderColor = paymentErrors.expiryDate ? 'var(--error)' : 'var(--accent-amber)'}
+                      onBlur={(e) => e.target.style.borderColor = paymentErrors.expiryDate ? 'var(--error)' : 'var(--border-medium)'}
+                    />
+                    {paymentErrors.expiryDate && (
+                      <p style={{
+                        fontSize: '0.75rem',
+                        fontFamily: 'DM Sans',
+                        color: 'var(--error)',
+                        margin: '0.5rem 0 0 0',
+                      }}>
+                        {paymentErrors.expiryDate}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label style={{
+                      display: 'block',
+                      fontSize: '0.875rem',
+                      fontFamily: 'DM Sans',
+                      color: 'var(--text-secondary)',
+                      marginBottom: '0.5rem',
+                    }}>
+                      CVV
+                    </label>
+                    <input
+                      type="password"
+                      value={cvv}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '').slice(0, 3);
+                        setCvv(value);
+                        if (paymentErrors.cvv) {
+                          setPaymentErrors({ ...paymentErrors, cvv: '' });
+                        }
+                      }}
+                      placeholder="•••"
+                      maxLength="3"
+                      style={{
+                        width: '100%',
+                        backgroundColor: 'var(--background-tertiary)',
+                        border: paymentErrors.cvv ? '1px solid var(--error)' : '1px solid var(--border-medium)',
+                        color: 'var(--text-primary)',
+                        padding: '1rem',
+                        fontSize: '1rem',
+                        fontFamily: 'DM Sans',
+                        borderRadius: '12px',
+                        boxSizing: 'border-box',
+                      }}
+                      onFocus={(e) => e.target.style.borderColor = paymentErrors.cvv ? 'var(--error)' : 'var(--accent-amber)'}
+                      onBlur={(e) => e.target.style.borderColor = paymentErrors.cvv ? 'var(--error)' : 'var(--border-medium)'}
+                    />
+                    {paymentErrors.cvv && (
+                      <p style={{
+                        fontSize: '0.75rem',
+                        fontFamily: 'DM Sans',
+                        color: 'var(--error)',
+                        margin: '0.5rem 0 0 0',
+                      }}>
+                        {paymentErrors.cvv}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Card Icons */}
+                <div style={{
+                  display: 'flex',
+                  gap: '1rem',
+                  marginBottom: '1rem',
+                  alignItems: 'center',
+                }}>
+                  <span style={{
+                    backgroundColor: 'rgba(232, 146, 10, 0.1)',
+                    border: '1px solid var(--border-medium)',
+                    color: 'var(--accent-amber)',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    fontFamily: 'DM Sans',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                  }}>
+                    Visa
+                  </span>
+                  <span style={{
+                    backgroundColor: 'rgba(232, 146, 10, 0.1)',
+                    border: '1px solid var(--border-medium)',
+                    color: 'var(--accent-amber)',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    fontFamily: 'DM Sans',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                  }}>
+                    Mastercard
+                  </span>
+                  <span style={{
+                    backgroundColor: 'rgba(232, 146, 10, 0.1)',
+                    border: '1px solid var(--border-medium)',
+                    color: 'var(--accent-amber)',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '6px',
+                    fontSize: '0.75rem',
+                    fontFamily: 'DM Sans',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                  }}>
+                    Amex
+                  </span>
+                </div>
+
+                {/* SSL Security */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  fontSize: '0.875rem',
+                  fontFamily: 'DM Sans',
+                  color: 'var(--text-muted)',
+                }}>
+                  <span style={{ fontSize: '1rem' }}>🔒</span>
+                  <span>Secured with 256-bit SSL encryption</span>
+                </div>
               </div>
 
               {/* Place Order */}
               <motion.button
-                whileHover={ageConfirmed && firstName && lastName && email && address1 && city && postcode ? { scale: 1.02 } : {}}
-                whileTap={ageConfirmed && firstName && lastName && email && address1 && city && postcode ? { scale: 0.98 } : {}}
+                whileHover={ageConfirmed && firstName && lastName && email && address1 && city && postcode && cardNumber && expiryDate && cvv ? { scale: 1.02 } : {}}
+                whileTap={ageConfirmed && firstName && lastName && email && address1 && city && postcode && cardNumber && expiryDate && cvv ? { scale: 0.98 } : {}}
                 onClick={handleDeliverySubmit}
-                disabled={!ageConfirmed || !firstName || !lastName || !email || !address1 || !city || !postcode}
+                disabled={!ageConfirmed || !firstName || !lastName || !email || !address1 || !city || !postcode || !cardNumber || !expiryDate || !cvv}
                 style={{
                   width: '100%',
                   backgroundColor:
-                    ageConfirmed && firstName && lastName && email && address1 && city && postcode
+                    ageConfirmed && firstName && lastName && email && address1 && city && postcode && cardNumber && expiryDate && cvv
                       ? 'var(--accent-amber)'
                       : 'var(--background-tertiary)',
                   color:
-                    ageConfirmed && firstName && lastName && email && address1 && city && postcode
+                    ageConfirmed && firstName && lastName && email && address1 && city && postcode && cardNumber && expiryDate && cvv
                       ? 'var(--background-primary)'
                       : 'var(--text-muted)',
                   border: 'none',

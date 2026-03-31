@@ -1,4 +1,5 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
 import { useTheme } from '../../hooks/useTheme';
 import { useBasket } from '../../hooks/useBasket';
 import Logo from '../ui/Logo';
@@ -7,6 +8,54 @@ export default function Header() {
   const { theme, toggleTheme } = useTheme();
   const { itemCount } = useBasket();
   const location = useLocation();
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const logoClickCount = useRef(0);
+  const logoClickTimer = useRef(null);
+
+  useEffect(() => {
+    const sessionStr = localStorage.getItem('beerworld_session');
+    if (sessionStr) {
+      try {
+        const session = JSON.parse(sessionStr);
+        setUser(session);
+      } catch (e) {
+        console.error('Error parsing session:', e);
+      }
+    }
+  }, [location]);
+
+  const handleSignOut = () => {
+    localStorage.removeItem('beerworld_session');
+    setUser(null);
+    navigate('/discover');
+  };
+
+  const handleLogoClick = (e) => {
+    e.preventDefault();
+    logoClickCount.current += 1;
+
+    // Clear existing timer
+    if (logoClickTimer.current) {
+      clearTimeout(logoClickTimer.current);
+    }
+
+    // If triple-clicked, trigger demo controls
+    if (logoClickCount.current === 3) {
+      window.dispatchEvent(new CustomEvent('beerworld_demo_trigger'));
+      logoClickCount.current = 0;
+      return;
+    }
+
+    // Reset counter and handle click count after 500ms
+    logoClickTimer.current = setTimeout(() => {
+      if (logoClickCount.current === 1) {
+        // Single click - navigate to discover
+        navigate('/discover');
+      }
+      logoClickCount.current = 0;
+    }, 500);
+  };
 
   const isActive = (path) => {
     return location.pathname === path;
@@ -22,6 +71,11 @@ export default function Header() {
 
   return (
     <header style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      zIndex: 100,
       backgroundColor: 'var(--background-secondary)',
       borderBottom: '1px solid var(--border-subtle)',
       padding: '1rem 2rem',
@@ -30,9 +84,12 @@ export default function Header() {
       justifyContent: 'space-between',
       gap: '2rem',
     }}>
-      <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+      <div
+        onClick={handleLogoClick}
+        style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+      >
         <Logo variant="icon" />
-      </Link>
+      </div>
 
       <nav style={{ display: 'flex', gap: '2rem', alignItems: 'center', flex: 1, justifyContent: 'center' }}>
         <Link to="/discover" style={navLinkStyle('/discover')}>Discover</Link>
@@ -40,7 +97,7 @@ export default function Header() {
         <Link to="/about" style={navLinkStyle('/about')}>About</Link>
       </nav>
 
-      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
         <button
           onClick={toggleTheme}
           style={{
@@ -55,6 +112,62 @@ export default function Header() {
         >
           {theme === 'dark' ? '☀️' : '🌙'}
         </button>
+
+        {/* User Authentication */}
+        {user ? (
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <span style={{
+              fontSize: '0.95rem',
+              fontFamily: 'DM Sans',
+              color: 'var(--text-primary)',
+            }}>
+              {user.firstName}
+            </span>
+            <button
+              onClick={handleSignOut}
+              style={{
+                backgroundColor: 'transparent',
+                color: 'var(--text-primary)',
+                border: 'none',
+                fontSize: '0.95rem',
+                fontFamily: 'DM Sans',
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                transition: 'color 200ms ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = 'var(--accent-amber)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--text-primary)';
+              }}
+            >
+              Sign out
+            </button>
+          </div>
+        ) : (
+          <Link
+            to="/login"
+            style={{
+              fontSize: '0.95rem',
+              fontFamily: 'DM Sans',
+              color: 'var(--text-primary)',
+              textDecoration: 'none',
+              cursor: 'pointer',
+              borderBottom: '1px solid transparent',
+              transition: 'border-bottom 200ms ease',
+              paddingBottom: '0.25rem',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderBottomColor = 'var(--accent-amber)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderBottomColor = 'transparent';
+            }}
+          >
+            Sign in
+          </Link>
+        )}
 
         <Link to="/checkout" style={{ position: 'relative', display: 'flex' }}>
           <span style={{ fontSize: '24px', color: 'var(--accent-amber)' }}>🛒</span>

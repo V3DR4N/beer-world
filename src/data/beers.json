@@ -11,7 +11,9 @@
     "inStock": true,
     "moods": ["light-and-fruity", "adventurous"],
     "humanDescription": "Light, fruity, slightly spicy. The kind of beer that makes you want to sit outside.",
-    "imageUrl": "/images/beers/1.jpg"
+    "imageUrl": "/images/beers/1.jpg",
+    "averageRating": 4.8,
+    "ratingCount": 134
   },
   {
     "id": "nacht-lambic",
@@ -25,7 +27,9 @@
     "inStock": true,
     "moods": ["adventurous", "sophisticated"],
     "humanDescription": "Sour, dry, deeply complex. For when you want something that will make you think.",
-    "imageUrl": "/images/beers/2.jpg"
+    "imageUrl": "/images/beers/2.jpg",
+    "averageRating": 4.6,
+    "ratingCount": 89
   },
   {
     "id": "zomer-wit",
@@ -39,7 +43,9 @@
     "inStock": true,
     "moods": ["light-and-fruity", "easy-drinking"],
     "humanDescription": "Cloudy, citrusy, refreshing. The perfect introduction to Belgian craft beer.",
-    "imageUrl": "/images/beers/3.jpg"
+    "imageUrl": "/images/beers/3.jpg",
+    "averageRating": 4.3,
+    "ratingCount": 112
   },
   {
     "id": "schwarzwald-dunkel",
@@ -53,7 +59,9 @@
     "inStock": true,
     "moods": ["rich-and-complex", "sophisticated"],
     "humanDescription": "Rich, smooth, slightly smoky. Like sitting next to a fire in the middle of a forest.",
-    "imageUrl": "/images/beers/4.jpg"
+    "imageUrl": "/images/beers/4.jpg",
+    "averageRating": 4.7,
+    "ratingCount": 98
   },
   {
     "id": "fichten-ipa",
@@ -67,7 +75,9 @@
     "inStock": true,
     "moods": ["adventurous", "rich-and-complex"],
     "humanDescription": "Bitter, piney, unlike any IPA you have tried. Spruce tips make it taste like a forest walk in a glass.",
-    "imageUrl": "/images/beers/5.jpg"
+    "imageUrl": "/images/beers/5.jpg",
+    "averageRating": 4.5,
+    "ratingCount": 76
   },
   {
     "id": "herbst-rauch",
@@ -81,7 +91,9 @@
     "inStock": false,
     "moods": ["sophisticated", "rich-and-complex"],
     "humanDescription": "Rich, earthy, deeply savoury. Best enjoyed with food on a dark evening.",
-    "imageUrl": "/images/beers/6.jpg"
+    "imageUrl": "/images/beers/6.jpg",
+    "averageRating": 4.9,
+    "ratingCount": 43
   },
   {
     "id": "noorden-pale",
@@ -95,7 +107,9 @@
     "inStock": true,
     "moods": ["easy-drinking", "light-and-fruity"],
     "humanDescription": "Tropical, citrusy, very easy to drink. Converts people who think they do not like craft beer.",
-    "imageUrl": "/images/beers/7.jpg"
+    "imageUrl": "/images/beers/7.jpg",
+    "averageRating": 4.4,
+    "ratingCount": 156
   },
   {
     "id": "noord-session-ipa",
@@ -109,7 +123,9 @@
     "inStock": true,
     "moods": ["easy-drinking", "light-and-fruity"],
     "humanDescription": "Hoppy and fruity but light enough to have a few. The clever choice.",
-    "imageUrl": "/images/beers/8.jpg"
+    "imageUrl": "/images/beers/8.jpg",
+    "averageRating": 4.2,
+    "ratingCount": 201
   },
   {
     "id": "amsterdam-stout",
@@ -123,6 +139,8 @@
     "inStock": true,
     "moods": ["rich-and-complex", "easy-drinking"],
     "humanDescription": "Dark, roasty, surprisingly refreshing. The coffee lover's beer.",
-    "imageUrl": "/images/beers/9.jpg"
+    "imageUrl": "/images/beers/9.jpg",
+    "averageRating": 4.6,
+    "ratingCount": 88
   }
 ]
