@@ -153,6 +153,7 @@ export default function BrewerPage() {
             display: 'flex',
             alignItems: 'center',
             gap: '0.5rem',
+            marginTop: '-20px',
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = 'var(--accent-amber)';
