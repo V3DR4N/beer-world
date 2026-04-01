@@ -42,7 +42,13 @@ export const BREWER_ORDERS = [
   {
     id: "ORD-001",
     customerName: "Emma Schmidt",
+    address1: "Hauptstraße 42",
+    address2: "",
     city: "Berlin",
+    postcode: "10115",
+    country: "Germany",
+    email: "emma.schmidt@email.de",
+    phone: "+49 30 555 1234",
     date: "2026-03-28",
     status: "pending",
     beers: [
@@ -53,7 +59,13 @@ export const BREWER_ORDERS = [
   {
     id: "ORD-002",
     customerName: "Marcus Mueller",
+    address1: "Marienplatz 15, Apt 5",
+    address2: "",
     city: "Munich",
+    postcode: "80331",
+    country: "Germany",
+    email: "marcus.mueller@email.de",
+    phone: "+49 89 555 2345",
     date: "2026-03-27",
     status: "shipped",
     beers: [
@@ -65,7 +77,13 @@ export const BREWER_ORDERS = [
   {
     id: "ORD-003",
     customerName: "Anna Weber",
+    address1: "Charlottenstraße 88",
+    address2: "Building B",
     city: "Berlin",
+    postcode: "10969",
+    country: "Germany",
+    email: "anna.weber@email.de",
+    phone: "+49 30 555 3456",
     date: "2026-03-26",
     status: "delivered",
     beers: [
@@ -76,7 +94,13 @@ export const BREWER_ORDERS = [
   {
     id: "ORD-004",
     customerName: "Klaus Fischer",
+    address1: "Zeil 106",
+    address2: "",
     city: "Frankfurt",
+    postcode: "60313",
+    country: "Germany",
+    email: "klaus.fischer@email.de",
+    phone: "+49 69 555 4567",
     date: "2026-03-25",
     status: "pending",
     beers: [
@@ -87,7 +111,13 @@ export const BREWER_ORDERS = [
   {
     id: "ORD-005",
     customerName: "Sarah Hoffmann",
+    address1: "Königstraße 1",
+    address2: "Suite 200",
     city: "Stuttgart",
+    postcode: "70173",
+    country: "Germany",
+    email: "sarah.hoffmann@email.de",
+    phone: "+49 711 555 5678",
     date: "2026-03-24",
     status: "shipped",
     beers: [
@@ -98,7 +128,13 @@ export const BREWER_ORDERS = [
   {
     id: "ORD-006",
     customerName: "Thomas Mueller",
+    address1: "Jungfernstieg 1",
+    address2: "",
     city: "Hamburg",
+    postcode: "20354",
+    country: "Germany",
+    email: "thomas.mueller@email.de",
+    phone: "+49 40 555 6789",
     date: "2026-03-23",
     status: "delivered",
     beers: [
@@ -110,7 +146,13 @@ export const BREWER_ORDERS = [
   {
     id: "ORD-007",
     customerName: "Petra Schmidt",
+    address1: "Hohenzollernring 56",
+    address2: "",
     city: "Cologne",
+    postcode: "50672",
+    country: "Germany",
+    email: "petra.schmidt@email.de",
+    phone: "+49 221 555 7890",
     date: "2026-03-22",
     status: "delivered",
     beers: [
@@ -121,7 +163,13 @@ export const BREWER_ORDERS = [
   {
     id: "ORD-008",
     customerName: "Michael Beck",
+    address1: "Augustusplatz 1",
+    address2: "Apartment 12",
     city: "Leipzig",
+    postcode: "04109",
+    country: "Germany",
+    email: "michael.beck@email.de",
+    phone: "+49 341 555 8901",
     date: "2026-03-21",
     status: "pending",
     beers: [
@@ -133,7 +181,13 @@ export const BREWER_ORDERS = [
   {
     id: "ORD-009",
     customerName: "Julia Braun",
+    address1: "Heinrich-Heine-Allee 3",
+    address2: "",
     city: "Düsseldorf",
+    postcode: "40213",
+    country: "Germany",
+    email: "julia.braun@email.de",
+    phone: "+49 211 555 9012",
     date: "2026-03-20",
     status: "shipped",
     beers: [
@@ -144,7 +198,13 @@ export const BREWER_ORDERS = [
   {
     id: "ORD-010",
     customerName: "Wolfgang Lang",
+    address1: "Kaiserstraße 1",
+    address2: "",
     city: "Nuremberg",
+    postcode: "90403",
+    country: "Germany",
+    email: "wolfgang.lang@email.de",
+    phone: "+49 911 555 0123",
     date: "2026-03-19",
     status: "delivered",
     beers: [

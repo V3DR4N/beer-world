@@ -143,41 +143,128 @@ export default function OrderDetailModal({ order, isOpen, onClose, statusColors 
         <div
           style={{
             marginBottom: '2rem',
-            padding: '1rem',
+            padding: '1.5rem',
             backgroundColor: 'var(--background-tertiary)',
             borderRadius: '4px',
+            border: '1px solid var(--border-subtle)',
           }}
         >
+          {/* Section Title */}
           <p
             style={{
               fontSize: '0.75rem',
               color: 'var(--text-secondary)',
-              margin: '0 0 0.5rem 0',
+              margin: '0 0 1rem 0',
               textTransform: 'uppercase',
-              fontWeight: '500',
+              fontWeight: '600',
+              letterSpacing: '0.5px',
             }}
           >
-            Customer Information
+            Shipping Information
           </p>
-          <p
-            style={{
-              fontSize: '0.95rem',
-              color: 'var(--text-primary)',
-              margin: '0 0 0.25rem 0',
-              fontWeight: '500',
-            }}
-          >
-            {order.customerName}
-          </p>
-          <p
-            style={{
-              fontSize: '0.875rem',
-              color: 'var(--text-secondary)',
-              margin: '0',
-            }}
-          >
-            {order.city}
-          </p>
+
+          {/* Two-column layout for contact and address */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1rem' }}>
+            {/* Contact Details */}
+            <div>
+              <p
+                style={{
+                  fontSize: '0.75rem',
+                  color: 'var(--text-secondary)',
+                  margin: '0 0 0.5rem 0',
+                  textTransform: 'uppercase',
+                  fontWeight: '500',
+                  fontSize: '0.7rem',
+                }}
+              >
+                Contact
+              </p>
+              <p
+                style={{
+                  fontSize: '0.95rem',
+                  color: 'var(--text-primary)',
+                  margin: '0 0 0.5rem 0',
+                  fontWeight: '500',
+                }}
+              >
+                {order.customerName}
+              </p>
+              <p
+                style={{
+                  fontSize: '0.85rem',
+                  color: 'var(--text-secondary)',
+                  margin: '0 0 0.5rem 0',
+                  wordBreak: 'break-word',
+                }}
+              >
+                {order.email}
+              </p>
+              <p
+                style={{
+                  fontSize: '0.85rem',
+                  color: 'var(--text-secondary)',
+                  margin: '0',
+                }}
+              >
+                {order.phone}
+              </p>
+            </div>
+
+            {/* Shipping Address */}
+            <div>
+              <p
+                style={{
+                  fontSize: '0.75rem',
+                  color: 'var(--text-secondary)',
+                  margin: '0 0 0.5rem 0',
+                  textTransform: 'uppercase',
+                  fontWeight: '500',
+                  fontSize: '0.7rem',
+                }}
+              >
+                Address
+              </p>
+              <p
+                style={{
+                  fontSize: '0.85rem',
+                  color: 'var(--text-primary)',
+                  margin: '0 0 0.25rem 0',
+                  fontWeight: '500',
+                }}
+              >
+                {order.address1}
+              </p>
+              {order.address2 && (
+                <p
+                  style={{
+                    fontSize: '0.85rem',
+                    color: 'var(--text-secondary)',
+                    margin: '0 0 0.25rem 0',
+                  }}
+                >
+                  {order.address2}
+                </p>
+              )}
+              <p
+                style={{
+                  fontSize: '0.85rem',
+                  color: 'var(--text-secondary)',
+                  margin: '0 0 0.25rem 0',
+                }}
+              >
+                {order.postcode} {order.city}
+              </p>
+              <p
+                style={{
+                  fontSize: '0.85rem',
+                  color: 'var(--text-secondary)',
+                  margin: '0',
+                }}
+              >
+                {order.country}
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Items Ordered */}
