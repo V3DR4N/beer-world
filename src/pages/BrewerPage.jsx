@@ -400,7 +400,7 @@ export default function BrewerPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            style={{ paddingTop: 'clamp(100px, 20vw, 200px)' }}
+            style={{ paddingTop: 'clamp(80px, 20vw, 180px)' }}
           >
             {/* Story */}
             <div style={{ marginBottom: '3rem' }}>
@@ -413,7 +413,7 @@ export default function BrewerPage() {
                 marginBottom: '1rem',
                 display: 'block',
               }}>
-                Story
+                Our Story
               </span>
 
               <p style={{
@@ -445,7 +445,7 @@ export default function BrewerPage() {
                 marginBottom: '1rem',
                 display: 'block',
               }}>
-                Philosophy
+                Our Philosophy
               </span>
 
               <p style={{
