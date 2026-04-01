@@ -15,13 +15,46 @@ const FILTER_TABS = [
   { key: 'delivered', label: 'Delivered' },
 ];
 
+const ITEMS_PER_PAGE = 5;
+
 export default function OrdersSection() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const filteredOrders =
+  // First filter by status
+  const statusFiltered =
     activeFilter === 'all' ? BREWER_ORDERS : BREWER_ORDERS.filter((o) => o.status === activeFilter);
+
+  // Then filter by search query
+  const filteredOrders = statusFiltered.filter((order) => {
+    const query = searchQuery.toLowerCase();
+    return (
+      order.id.toLowerCase().includes(query) ||
+      order.customerName.toLowerCase().includes(query) ||
+      order.city.toLowerCase().includes(query)
+    );
+  });
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
+  const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedOrders = filteredOrders.slice(startIdx, startIdx + ITEMS_PER_PAGE);
+
+  // Reset to page 1 when filter changes
+  const handleFilterChange = (newFilter) => {
+    setActiveFilter(newFilter);
+    setCurrentPage(1);
+    setSearchQuery('');
+  };
+
+  // Reset pagination when search changes
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1);
+  };
 
   const getStatusBadge = (status) => (
     <span
@@ -55,12 +88,36 @@ export default function OrdersSection() {
         Orders
       </h1>
 
+      {/* Search Box */}
+      <div style={{ marginBottom: '2rem' }}>
+        <input
+          type="text"
+          placeholder="Search by Order ID, Customer, or City..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          style={{
+            width: '100%',
+            padding: '0.75rem 1rem',
+            backgroundColor: 'var(--background-secondary)',
+            border: '1px solid var(--border-subtle)',
+            borderRadius: '4px',
+            fontFamily: 'DM Sans, sans-serif',
+            fontSize: '0.875rem',
+            color: 'var(--text-primary)',
+            outline: 'none',
+            transition: 'border-color 0.2s',
+          }}
+          onFocus={(e) => (e.target.style.borderColor = 'var(--accent-amber)')}
+          onBlur={(e) => (e.target.style.borderColor = 'var(--border-subtle)')}
+        />
+      </div>
+
       {/* Filter Tabs */}
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1rem' }}>
         {FILTER_TABS.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setActiveFilter(tab.key)}
+            onClick={() => handleFilterChange(tab.key)}
             style={{
               padding: '0.5rem 1rem',
               backgroundColor: 'transparent',
@@ -187,7 +244,7 @@ export default function OrdersSection() {
               </tr>
             </thead>
             <tbody>
-              {filteredOrders.map((order) => (
+              {paginatedOrders.map((order) => (
                 <tr
                   key={order.id}
                   onClick={() => {
@@ -276,6 +333,66 @@ export default function OrdersSection() {
           </div>
         )}
       </div>
+
+      {/* Pagination Controls */}
+      {filteredOrders.length > 0 && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginTop: '2rem',
+            paddingTop: '1rem',
+            borderTop: '1px solid var(--border-subtle)',
+          }}
+        >
+          {/* Page Info */}
+          <p
+            style={{
+              fontSize: '0.875rem',
+              color: 'var(--text-secondary)',
+              margin: '0',
+            }}
+          >
+            Showing {startIdx + 1} to {Math.min(startIdx + ITEMS_PER_PAGE, filteredOrders.length)} of {filteredOrders.length}
+          </p>
+
+          {/* Page Buttons */}
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                style={{
+                  padding: '0.5rem 0.75rem',
+                  backgroundColor:
+                    currentPage === page ? 'var(--accent-amber)' : 'var(--background-tertiary)',
+                  color: currentPage === page ? 'var(--background-primary)' : 'var(--text-primary)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '4px',
+                  fontFamily: 'DM Sans, sans-serif',
+                  fontSize: '0.875rem',
+                  fontWeight: currentPage === page ? '600' : '400',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s, color 0.2s',
+                }}
+                onMouseEnter={(e) => {
+                  if (currentPage !== page) {
+                    e.target.style.backgroundColor = 'var(--background-secondary)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (currentPage !== page) {
+                    e.target.style.backgroundColor = 'var(--background-tertiary)';
+                  }
+                }}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Order Detail Modal */}
       {showDetailModal && selectedOrder && (

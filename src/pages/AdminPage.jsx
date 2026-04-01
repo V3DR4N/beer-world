@@ -22,11 +22,17 @@ const STATUS_COLORS = {
   'Declined': '#EF4444',
 };
 
+const ITEMS_PER_PAGE = 5;
+
 export default function AdminPage() {
   const navigate = useNavigate();
   const { logout } = useContext(AdminSessionContext);
   const [activeSection, setActiveSection] = useState('invitations');
   const [invitations, setInvitations] = useState([]);
+
+  // Search and pagination states
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Form states
   const [breweryName, setBreweryName] = useState('');
@@ -484,8 +490,56 @@ export default function AdminPage() {
               </form>
             </motion.div>
 
-            {/* Invitations Table */}
-            <motion.div
+            {/* Search and Pagination Setup */}
+            {(() => {
+              // Filter invitations by search query
+              const filtered = invitations.filter((inv) => {
+                const query = searchQuery.toLowerCase();
+                return (
+                  inv.breweryName.toLowerCase().includes(query) ||
+                  inv.contactName.toLowerCase().includes(query) ||
+                  inv.country.toLowerCase().includes(query) ||
+                  inv.status.toLowerCase().includes(query)
+                );
+              });
+
+              // Calculate pagination
+              const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+              const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+              const paginatedInvitations = filtered.slice(startIdx, startIdx + ITEMS_PER_PAGE);
+
+              return (
+                <>
+                  {/* Search Box */}
+                  <div style={{ marginBottom: '2rem' }}>
+                    <input
+                      type="text"
+                      placeholder="Search by Brewery Name, Contact, Country, or Status..."
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem 1rem',
+                        backgroundColor: 'var(--background-secondary)',
+                        border: '1px solid var(--border-subtle)',
+                        borderRadius: '4px',
+                        fontFamily: 'DM Sans, sans-serif',
+                        fontSize: '0.875rem',
+                        color: 'var(--text-primary)',
+                        outline: 'none',
+                        transition: 'border-color 0.2s',
+                        boxSizing: 'border-box',
+                      }}
+                      onFocus={(e) => (e.target.style.borderColor = 'var(--accent-amber)')}
+                      onBlur={(e) => (e.target.style.borderColor = 'var(--border-subtle)')}
+                    />
+                  </div>
+
+                  {/* Invitations Table */}
+                  <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.3, delay: 0.2 }}
@@ -515,9 +569,9 @@ export default function AdminPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {invitations.map((inv, index) => (
+                    {paginatedInvitations.map((inv, index) => (
                       <tr key={inv.id} style={{
-                        borderBottom: index < invitations.length - 1 ? '1px solid var(--border-subtle)' : 'none',
+                        borderBottom: index < paginatedInvitations.length - 1 ? '1px solid var(--border-subtle)' : 'none',
                       }}>
                         <td style={{ padding: '1rem', fontSize: '0.95rem', fontFamily: 'DM Sans', color: 'var(--text-primary)' }}>{inv.breweryName}</td>
                         <td style={{ padding: '1rem', fontSize: '0.95rem', fontFamily: 'DM Sans', color: 'var(--text-primary)' }}>{inv.contactName}</td>
@@ -597,6 +651,73 @@ export default function AdminPage() {
                 </table>
               </div>
             </motion.div>
+
+            {/* Empty State */}
+            {filtered.length === 0 && (
+              <div style={{ padding: '3rem', textAlign: 'center' }}>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: '0' }}>
+                  No invitations found for this search.
+                </p>
+              </div>
+            )}
+
+            {/* Pagination Controls */}
+            {filtered.length > 0 && (
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: '2rem',
+                paddingTop: '1rem',
+                borderTop: '1px solid var(--border-subtle)',
+              }}>
+                {/* Page Info */}
+                <p style={{
+                  fontSize: '0.875rem',
+                  color: 'var(--text-secondary)',
+                  margin: '0',
+                }}>
+                  Showing {startIdx + 1} to {Math.min(startIdx + ITEMS_PER_PAGE, filtered.length)} of {filtered.length}
+                </p>
+
+                {/* Page Buttons */}
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      style={{
+                        padding: '0.5rem 0.75rem',
+                        backgroundColor: currentPage === page ? 'var(--accent-amber)' : 'var(--background-tertiary)',
+                        color: currentPage === page ? 'var(--background-primary)' : 'var(--text-primary)',
+                        border: '1px solid var(--border-subtle)',
+                        borderRadius: '4px',
+                        fontFamily: 'DM Sans, sans-serif',
+                        fontSize: '0.875rem',
+                        fontWeight: currentPage === page ? '600' : '400',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.2s, color 0.2s',
+                      }}
+                      onMouseEnter={(e) => {
+                        if (currentPage !== page) {
+                          e.target.style.backgroundColor = 'var(--background-secondary)';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (currentPage !== page) {
+                          e.target.style.backgroundColor = 'var(--background-tertiary)';
+                        }
+                      }}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+          );
+            })()}
           </div>
         )}
 
