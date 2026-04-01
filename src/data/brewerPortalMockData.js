@@ -45,7 +45,9 @@ export const BREWER_ORDERS = [
     city: "Berlin",
     date: "2026-03-28",
     status: "pending",
-    beers: ["Dunkel"],
+    beers: [
+      { name: "Schwarzwald Dunkel", quantity: 10, pricePerUnit: 5.20 },
+    ],
     amount: 52.00,
   },
   {
@@ -54,8 +56,11 @@ export const BREWER_ORDERS = [
     city: "Munich",
     date: "2026-03-27",
     status: "shipped",
-    beers: ["Smoked", "IPA"],
-    amount: 124.00,
+    beers: [
+      { name: "Schwarzwald Smoked", quantity: 8, pricePerUnit: 5.80 },
+      { name: "Schwarzwald IPA", quantity: 12, pricePerUnit: 6.20 },
+    ],
+    amount: 120.80,
   },
   {
     id: "ORD-003",
@@ -63,7 +68,9 @@ export const BREWER_ORDERS = [
     city: "Berlin",
     date: "2026-03-26",
     status: "delivered",
-    beers: ["Dunkel"],
+    beers: [
+      { name: "Schwarzwald Dunkel", quantity: 10, pricePerUnit: 5.20 },
+    ],
     amount: 52.00,
   },
   {
@@ -72,7 +79,9 @@ export const BREWER_ORDERS = [
     city: "Frankfurt",
     date: "2026-03-25",
     status: "pending",
-    beers: ["Smoked"],
+    beers: [
+      { name: "Schwarzwald Smoked", quantity: 10, pricePerUnit: 5.80 },
+    ],
     amount: 58.00,
   },
   {
@@ -81,7 +90,9 @@ export const BREWER_ORDERS = [
     city: "Stuttgart",
     date: "2026-03-24",
     status: "shipped",
-    beers: ["IPA"],
+    beers: [
+      { name: "Schwarzwald IPA", quantity: 10, pricePerUnit: 6.20 },
+    ],
     amount: 62.00,
   },
   {
@@ -90,8 +101,11 @@ export const BREWER_ORDERS = [
     city: "Hamburg",
     date: "2026-03-23",
     status: "delivered",
-    beers: ["Dunkel", "Smoked"],
-    amount: 116.00,
+    beers: [
+      { name: "Schwarzwald Dunkel", quantity: 10, pricePerUnit: 5.20 },
+      { name: "Schwarzwald Smoked", quantity: 5, pricePerUnit: 5.80 },
+    ],
+    amount: 81.00,
   },
   {
     id: "ORD-007",
@@ -99,7 +113,9 @@ export const BREWER_ORDERS = [
     city: "Cologne",
     date: "2026-03-22",
     status: "delivered",
-    beers: ["IPA"],
+    beers: [
+      { name: "Schwarzwald IPA", quantity: 10, pricePerUnit: 6.20 },
+    ],
     amount: 62.00,
   },
   {
@@ -108,8 +124,11 @@ export const BREWER_ORDERS = [
     city: "Leipzig",
     date: "2026-03-21",
     status: "pending",
-    beers: ["Dunkel", "IPA"],
-    amount: 114.00,
+    beers: [
+      { name: "Schwarzwald Dunkel", quantity: 8, pricePerUnit: 5.20 },
+      { name: "Schwarzwald IPA", quantity: 8, pricePerUnit: 6.20 },
+    ],
+    amount: 95.20,
   },
   {
     id: "ORD-009",
@@ -117,7 +136,9 @@ export const BREWER_ORDERS = [
     city: "Düsseldorf",
     date: "2026-03-20",
     status: "shipped",
-    beers: ["Smoked"],
+    beers: [
+      { name: "Schwarzwald Smoked", quantity: 10, pricePerUnit: 5.80 },
+    ],
     amount: 58.00,
   },
   {
@@ -126,7 +147,11 @@ export const BREWER_ORDERS = [
     city: "Nuremberg",
     date: "2026-03-19",
     status: "delivered",
-    beers: ["Dunkel", "Smoked", "IPA"],
-    amount: 186.00,
+    beers: [
+      { name: "Schwarzwald Dunkel", quantity: 10, pricePerUnit: 5.20 },
+      { name: "Schwarzwald Smoked", quantity: 5, pricePerUnit: 5.80 },
+      { name: "Schwarzwald IPA", quantity: 8, pricePerUnit: 6.20 },
+    ],
+    amount: 148.40,
   },
 ];

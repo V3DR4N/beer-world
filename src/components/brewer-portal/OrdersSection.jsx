@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { BREWER_ORDERS } from '../../data/brewerPortalMockData';
+import OrderDetailModal from './OrderDetailModal';
 
 const STATUS_COLORS = {
   pending: 'var(--accent-amber)',
@@ -16,6 +17,8 @@ const FILTER_TABS = [
 
 export default function OrdersSection() {
   const [activeFilter, setActiveFilter] = useState('all');
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
   const filteredOrders =
     activeFilter === 'all' ? BREWER_ORDERS : BREWER_ORDERS.filter((o) => o.status === activeFilter);
@@ -187,9 +190,14 @@ export default function OrdersSection() {
               {filteredOrders.map((order) => (
                 <tr
                   key={order.id}
+                  onClick={() => {
+                    setSelectedOrder(order);
+                    setShowDetailModal(true);
+                  }}
                   style={{
                     borderBottom: '1px solid var(--border-subtle)',
                     transition: 'background-color 0.2s',
+                    cursor: 'pointer',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'var(--background-tertiary)';
@@ -233,7 +241,7 @@ export default function OrdersSection() {
                       fontSize: '0.875rem',
                     }}
                   >
-                    {order.beers.join(', ')}
+                    {order.beers.map((item) => item.name.replace('Schwarzwald ', '')).join(', ')}
                   </td>
                   <td
                     style={{
@@ -268,6 +276,16 @@ export default function OrdersSection() {
           </div>
         )}
       </div>
+
+      {/* Order Detail Modal */}
+      {showDetailModal && selectedOrder && (
+        <OrderDetailModal
+          order={selectedOrder}
+          isOpen={showDetailModal}
+          onClose={() => setShowDetailModal(false)}
+          statusColors={STATUS_COLORS}
+        />
+      )}
     </div>
   );
 }
