@@ -448,7 +448,7 @@ export default function CheckoutPage() {
                     fontFamily: 'DM Sans',
                   }}
                 >
-                  Clicked! Link copied to clipboard.
+                  Copied! Link copied to clipboard.
                 </motion.div>
               )}
 

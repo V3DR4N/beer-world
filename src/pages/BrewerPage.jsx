@@ -135,7 +135,7 @@ export default function BrewerPage() {
       <div style={{
         position: 'relative',
         zIndex: 10,
-        padding: '2rem 0 0 1rem',
+        padding: 'calc(2rem - 10px) 0 0 1rem',
       }}>
         <button
           onClick={() => navigate('/discover')}
@@ -143,8 +143,8 @@ export default function BrewerPage() {
             backgroundColor: 'transparent',
             color: 'white',
             border: '1px solid white',
-            padding: '0.75rem 1.5rem',
-            fontSize: '0.95rem',
+            padding: '0.5rem 1rem',
+            fontSize: '0.85rem',
             fontFamily: 'DM Sans',
             fontWeight: '600',
             borderRadius: '6px',
@@ -355,7 +355,7 @@ export default function BrewerPage() {
                 fontFamily: 'DM Sans',
                 marginLeft: '0.5rem',
               }}>
-                Clicked!
+                Copied!
               </span>
             )}
           </div>
