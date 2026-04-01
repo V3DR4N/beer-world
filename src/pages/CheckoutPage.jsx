@@ -82,6 +82,7 @@ export default function CheckoutPage() {
   const [cvv, setCvv] = useState('');
   const [paymentErrors, setPaymentErrors] = useState({});
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
+  const [showCopySuccess, setShowCopySuccess] = useState(false);
 
   const discountPercent = promoApplied ? 15 : 0;
   const subtotal = total;
@@ -160,7 +161,9 @@ export default function CheckoutPage() {
   const handleCopyLink = () => {
     navigator.clipboard.writeText('https://beerworld.com');
     setCopiedToClipboard(true);
+    setShowCopySuccess(true);
     setTimeout(() => setCopiedToClipboard(false), 2000);
+    setTimeout(() => setShowCopySuccess(false), 2000);
   };
 
   // Payment formatting functions
@@ -428,97 +431,129 @@ export default function CheckoutPage() {
                 Tell your friends what's on the way 🍺
               </h3>
 
+              {/* Copy Success Message */}
+              {showCopySuccess && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  style={{
+                    backgroundColor: '#22C55E',
+                    color: 'white',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '6px',
+                    marginBottom: '1rem',
+                    textAlign: 'center',
+                    fontSize: '0.9rem',
+                    fontFamily: 'DM Sans',
+                  }}
+                >
+                  Clicked! Link copied to clipboard.
+                </motion.div>
+              )}
+
               <div style={{
                 display: 'flex',
-                gap: '1rem',
+                gap: '1.5rem',
                 justifyContent: 'center',
                 flexWrap: 'wrap',
+                alignItems: 'center',
               }}>
-                {/* WhatsApp Button */}
+                {/* Facebook Icon */}
                 <a
-                  href="https://wa.me/?text=Just ordered some incredible craft beer from Beer World. Discover yours at beerworld.com"
+                  href="https://www.facebook.com/sharer/sharer.php?u=https://beerworld.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
+                    width: '50px',
+                    height: '50px',
+                    borderRadius: '50%',
                     backgroundColor: 'var(--background-secondary)',
-                    color: 'var(--text-primary)',
-                    border: '1px solid var(--border-medium)',
-                    padding: '0.75rem 1.5rem',
-                    borderRadius: '6px',
-                    fontSize: '0.95rem',
-                    fontFamily: 'DM Sans',
-                    fontWeight: '600',
-                    textDecoration: 'none',
+                    border: '2px solid var(--border-medium)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     cursor: 'pointer',
                     transition: 'all 200ms ease',
+                    textDecoration: 'none',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--accent-amber)';
-                    e.currentTarget.style.color = 'var(--background-primary)';
+                    e.currentTarget.style.backgroundColor = '#1877F2';
+                    e.currentTarget.style.borderColor = '#1877F2';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = 'var(--background-secondary)';
-                    e.currentTarget.style.color = 'var(--text-primary)';
+                    e.currentTarget.style.borderColor = 'var(--border-medium)';
                   }}
+                  title="Share on Facebook"
                 >
-                  WhatsApp
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style={{ color: 'var(--text-primary)' }}>
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                  </svg>
                 </a>
 
-                {/* Twitter Button */}
+                {/* X/Twitter Icon */}
                 <a
                   href="https://twitter.com/intent/tweet?text=Just ordered some incredible craft beer from Beer World 🍺 Discover yours at beerworld.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
+                    width: '50px',
+                    height: '50px',
+                    borderRadius: '50%',
                     backgroundColor: 'var(--background-secondary)',
-                    color: 'var(--text-primary)',
-                    border: '1px solid var(--border-medium)',
-                    padding: '0.75rem 1.5rem',
-                    borderRadius: '6px',
-                    fontSize: '0.95rem',
-                    fontFamily: 'DM Sans',
-                    fontWeight: '600',
-                    textDecoration: 'none',
+                    border: '2px solid var(--border-medium)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     cursor: 'pointer',
                     transition: 'all 200ms ease',
+                    textDecoration: 'none',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--accent-amber)';
-                    e.currentTarget.style.color = 'var(--background-primary)';
+                    e.currentTarget.style.backgroundColor = '#000000';
+                    e.currentTarget.style.borderColor = '#000000';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = 'var(--background-secondary)';
-                    e.currentTarget.style.color = 'var(--text-primary)';
+                    e.currentTarget.style.borderColor = 'var(--border-medium)';
                   }}
+                  title="Share on X"
                 >
-                  X / Twitter
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style={{ color: 'var(--text-primary)' }}>
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.514l-5.106-6.666-5.829 6.666H2.306l7.644-8.74L2.25 2.25h6.734l4.611 6.09 5.649-6.09zM11.5 12.5L9.25 9l-2.5 3.5L7.5 16l2-4.5L15.5 21h2L11.5 12.5z" />
+                  </svg>
                 </a>
 
-                {/* Copy Link Button */}
+                {/* Copy Link Icon */}
                 <button
                   onClick={handleCopyLink}
                   style={{
+                    width: '50px',
+                    height: '50px',
+                    borderRadius: '50%',
                     backgroundColor: 'var(--background-secondary)',
-                    color: 'var(--text-primary)',
-                    border: '1px solid var(--border-medium)',
-                    padding: '0.75rem 1.5rem',
-                    borderRadius: '6px',
-                    fontSize: '0.95rem',
-                    fontFamily: 'DM Sans',
-                    fontWeight: '600',
+                    border: '2px solid var(--border-medium)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     cursor: 'pointer',
                     transition: 'all 200ms ease',
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'var(--accent-amber)';
-                    e.currentTarget.style.color = 'var(--background-primary)';
+                    e.currentTarget.style.borderColor = 'var(--accent-amber)';
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.backgroundColor = 'var(--background-secondary)';
-                    e.currentTarget.style.color = 'var(--text-primary)';
+                    e.currentTarget.style.borderColor = 'var(--border-medium)';
                   }}
+                  title="Copy link to clipboard"
                 >
-                  {copiedToClipboard ? 'Copied!' : 'Copy Link'}
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-primary)' }}>
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                  </svg>
                 </button>
               </div>
             </div>

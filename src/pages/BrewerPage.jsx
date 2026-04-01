@@ -26,6 +26,7 @@ export default function BrewerPage() {
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [copiedBrewerLink, setCopiedBrewerLink] = useState(false);
+  const [showCopySuccess, setShowCopySuccess] = useState(false);
 
   // Check if coming from discover page
   const fromDiscover = searchParams.get('from') === 'discover';
@@ -118,7 +119,9 @@ export default function BrewerPage() {
   const handleCopyBrewerLink = () => {
     navigator.clipboard.writeText(window.location.href);
     setCopiedBrewerLink(true);
+    setShowCopySuccess(true);
     setTimeout(() => setCopiedBrewerLink(false), 2000);
+    setTimeout(() => setShowCopySuccess(false), 2000);
   };
 
   return (
@@ -245,79 +248,86 @@ export default function BrewerPage() {
             justifyContent: 'flex-start',
             flexWrap: 'wrap',
             marginBottom: '1rem',
+            alignItems: 'center',
           }}>
-            {/* WhatsApp Button */}
+            {/* Facebook Icon */}
             <a
-              href={`https://wa.me/?text=Check out ${brewer.name} on Beer World 🍺 beerworld.com`}
+              href="https://www.facebook.com/sharer/sharer.php?u=https://beerworld.com"
               target="_blank"
               rel="noopener noreferrer"
               style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
                 backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                color: 'white',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                fontSize: '0.9rem',
-                fontFamily: 'DM Sans',
-                fontWeight: '600',
-                textDecoration: 'none',
+                border: '2px solid rgba(255, 255, 255, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 cursor: 'pointer',
                 transition: 'all 200ms ease',
+                textDecoration: 'none',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+                e.currentTarget.style.backgroundColor = '#1877F2';
+                e.currentTarget.style.borderColor = '#1877F2';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
                 e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
               }}
+              title="Share on Facebook"
             >
-              WhatsApp
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+              </svg>
             </a>
 
-            {/* Twitter Button */}
+            {/* X/Twitter Icon */}
             <a
               href={`https://twitter.com/intent/tweet?text=Check out ${brewer.name} on Beer World 🍺 beerworld.com`}
               target="_blank"
               rel="noopener noreferrer"
               style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
                 backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                color: 'white',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                fontSize: '0.9rem',
-                fontFamily: 'DM Sans',
-                fontWeight: '600',
-                textDecoration: 'none',
+                border: '2px solid rgba(255, 255, 255, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 cursor: 'pointer',
                 transition: 'all 200ms ease',
+                textDecoration: 'none',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.8)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
                 e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
               }}
+              title="Share on X"
             >
-              X / Twitter
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.514l-5.106-6.666-5.829 6.666H2.306l7.644-8.74L2.25 2.25h6.734l4.611 6.09 5.649-6.09zM11.5 12.5L9.25 9l-2.5 3.5L7.5 16l2-4.5L15.5 21h2L11.5 12.5z" />
+              </svg>
             </a>
 
-            {/* Copy Link Button */}
+            {/* Copy Link Icon */}
             <button
               onClick={handleCopyBrewerLink}
               style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
                 backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                color: 'white',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
-                padding: '0.5rem 1rem',
-                borderRadius: '6px',
-                fontSize: '0.9rem',
-                fontFamily: 'DM Sans',
-                fontWeight: '600',
+                border: '2px solid rgba(255, 255, 255, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 cursor: 'pointer',
                 transition: 'all 200ms ease',
               }}
@@ -329,9 +339,25 @@ export default function BrewerPage() {
                 e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
                 e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
               }}
+              title="Copy link to clipboard"
             >
-              {copiedBrewerLink ? 'Copied!' : 'Copy Link'}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+              </svg>
             </button>
+
+            {/* Copy Success Message */}
+            {showCopySuccess && (
+              <span style={{
+                color: '#22C55E',
+                fontSize: '0.875rem',
+                fontFamily: 'DM Sans',
+                marginLeft: '0.5rem',
+              }}>
+                Clicked!
+              </span>
+            )}
           </div>
 
           <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
