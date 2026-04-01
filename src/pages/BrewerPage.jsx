@@ -135,7 +135,7 @@ export default function BrewerPage() {
       <div style={{
         position: 'relative',
         zIndex: 10,
-        padding: 'calc(2rem - 10px) 0 0 1rem',
+        padding: 'calc(2rem - 30px) 0 0 1rem',
       }}>
         <button
           onClick={() => navigate('/discover')}
