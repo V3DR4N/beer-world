@@ -909,8 +909,9 @@ export default function BrewerPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
               onClick={() => {
-                const { saveScrollState } = useScrollRestoration();
-                saveScrollState(`/brewer/${brewerId}`, window.scrollY, {});
+                const { clearScrollState } = useScrollRestoration();
+                // Clear scroll state so page scrolls to top to show the beer detail
+                clearScrollState();
                 navigate(`/brewer/${brewerId}?beerId=${beer.id}`);
               }}
               style={{
