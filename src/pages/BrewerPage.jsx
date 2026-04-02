@@ -131,43 +131,6 @@ export default function BrewerPage() {
       transition={{ duration: 0.3 }}
       style={{ backgroundColor: 'var(--background-primary)', minHeight: '100vh' }}
     >
-      {/* Back Button */}
-      <div style={{
-        position: 'relative',
-        zIndex: 10,
-        padding: 'calc(2rem - 30px) 0 0 1rem',
-      }}>
-        <button
-          onClick={() => navigate('/discover')}
-          style={{
-            backgroundColor: 'transparent',
-            color: 'white',
-            border: '1px solid white',
-            padding: '0.5rem 1rem',
-            fontSize: '0.85rem',
-            fontFamily: 'DM Sans',
-            fontWeight: '600',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            transition: 'all 200ms ease',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            marginTop: '-11px',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'var(--accent-amber)';
-            e.currentTarget.style.color = 'var(--accent-amber)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'white';
-            e.currentTarget.style.color = 'white';
-          }}
-        >
-          ← Back to Discover
-        </button>
-      </div>
-
       {/* Cover Section */}
       <motion.div
         initial={{ scale: 1.05 }}
