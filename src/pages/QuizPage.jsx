@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Cookies from 'js-cookie';
 import { usePreferences } from '../hooks/usePreferences';
+import { useResponsive } from '../hooks/useResponsive';
 import Logo from '../components/ui/Logo';
 import quizConfig from '../data/quizConfig.json';
 
@@ -28,6 +29,7 @@ const EMOJI_MAP = {
 export default function QuizPage() {
   const navigate = useNavigate();
   const { saveProfile } = usePreferences();
+  const isMobile = useResponsive(768);
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState([]);
@@ -299,7 +301,7 @@ export default function QuizPage() {
             width: '100%',
             maxWidth: '1000px',
             display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
+            gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)',
             gap: '1rem',
             marginBottom: '2rem',
           }}

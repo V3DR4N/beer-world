@@ -13,6 +13,7 @@ import DemoControls from './components/dev/DemoControls';
 import ZendeskWidget from './components/support/ZendeskWidget';
 import QuizPage from './pages/QuizPage';
 import DiscoveryPage from './pages/DiscoveryPage';
+import BeerDetailPage from './pages/BeerDetailPage';
 import BrewerPage from './pages/BrewerPage';
 import BrewersListPage from './pages/BrewersListPage';
 import CheckoutPage from './pages/CheckoutPage';
@@ -69,7 +70,7 @@ function AppContent() {
   return (
     <>
       {!hideHeader && <Header />}
-      <div style={{ paddingTop: !hideHeader ? '80px' : '0' }}>
+      <div style={{ paddingTop: !hideHeader ? '80px' : '0', backgroundColor: 'var(--background-primary)' }}>
         <Routes>
           <Route path="/" element={<Navigate to="/discover" replace />} />
           <Route path="/quiz" element={<QuizPage />} />
@@ -77,6 +78,7 @@ function AppContent() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/discover" element={<DiscoveryPage />} />
           <Route path="/breweries" element={<BrewersListPage />} />
+          <Route path="/beer/:beerId" element={<BeerDetailPage />} />
           <Route path="/brewer/:id" element={<BrewerPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/about" element={<AboutPage />} />

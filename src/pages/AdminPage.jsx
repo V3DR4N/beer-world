@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useResponsive } from '../hooks/useResponsive';
 import { AdminSessionContext } from '../context/AdminSessionContext';
 
 const MOCK_INVITATIONS = [
@@ -27,6 +28,7 @@ const ITEMS_PER_PAGE = 5;
 export default function AdminPage() {
   const navigate = useNavigate();
   const { logout } = useContext(AdminSessionContext);
+  const isMobile = useResponsive(768);
   const [activeSection, setActiveSection] = useState('invitations');
   const [invitations, setInvitations] = useState([]);
 
@@ -750,7 +752,7 @@ export default function AdminPage() {
             {/* Stat Cards - Row 1 */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)',
               gap: '1.5rem',
               marginBottom: '2rem',
             }}>
@@ -964,7 +966,7 @@ export default function AdminPage() {
             {/* Market Breakdown */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
+              gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
               gap: '1.5rem',
             }}>
               {[

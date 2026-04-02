@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { useBasket } from '../hooks/useBasket';
+import { useResponsive } from '../hooks/useResponsive';
 import beers from '../data/beers.json';
 import brewers from '../data/brewers.json';
 
@@ -53,6 +54,7 @@ function AnimatedCheckmark() {
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const { items, total, clearBasket, removeItem, updateQuantity } = useBasket();
+  const isMobile = useResponsive(768);
 
   const [promoCode, setPromoCode] = useState('');
   const [promoApplied, setPromoApplied] = useState(false);
@@ -83,6 +85,25 @@ export default function CheckoutPage() {
   const [paymentErrors, setPaymentErrors] = useState({});
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
   const [showCopySuccess, setShowCopySuccess] = useState(false);
+
+  // Feedback dialog state
+  const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
+  const [feedbackText, setFeedbackText] = useState('');
+
+  // Check if user is already logged in on mount
+  useEffect(() => {
+    const sessionStr = localStorage.getItem('beerworld_session');
+    if (sessionStr) {
+      try {
+        const session = JSON.parse(sessionStr);
+        setEmail(session.email);
+        // Skip to delivery stage if already logged in
+        setStage('delivery');
+      } catch (e) {
+        console.error('Error parsing session:', e);
+      }
+    }
+  }, []);
 
   const discountPercent = promoApplied ? 15 : 0;
   const subtotal = total;
@@ -224,6 +245,23 @@ export default function CheckoutPage() {
   };
 
   const firstBeerBrewerId = items.length > 0 ? getBrewerName(items[0].brewerId) : null;
+
+  // Scroll to top when confirmation screen loads
+  useEffect(() => {
+    if (stage === 'confirmation') {
+      window.scrollTo(0, 0);
+    }
+  }, [stage]);
+
+  // Trigger feedback dialog 5 seconds after confirmation
+  useEffect(() => {
+    if (stage === 'confirmation') {
+      const timer = setTimeout(() => {
+        setShowFeedbackDialog(true);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [stage]);
 
   if (items.length === 0 && stage !== 'confirmation') {
     return (
@@ -581,6 +619,177 @@ export default function CheckoutPage() {
             </motion.button>
           </motion.div>
         </div>
+
+        {/* Feedback Dialog */}
+        <AnimatePresence>
+          {showFeedbackDialog && (
+            <>
+              {/* Overlay */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => setShowFeedbackDialog(false)}
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 1000,
+                  padding: '1rem',
+                }}
+              />
+
+              {/* Dialog */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                transition={{ duration: 0.3 }}
+                style={{
+                  position: 'fixed',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: isMobile ? 'calc(100% - 2rem)' : '500px',
+                  maxWidth: '500px',
+                  backgroundColor: 'var(--background-secondary)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: '12px',
+                  padding: '2rem',
+                  zIndex: 1001,
+                  boxShadow: '0 10px 40px rgba(0, 0, 0, 0.2)',
+                }}
+              >
+                {/* Close Button */}
+                <button
+                  onClick={() => setShowFeedbackDialog(false)}
+                  style={{
+                    position: 'absolute',
+                    top: '1rem',
+                    right: '1rem',
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-secondary)',
+                    fontSize: '1.5rem',
+                    cursor: 'pointer',
+                    padding: '0.5rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'color 200ms ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = 'var(--accent-amber)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = 'var(--text-secondary)';
+                  }}
+                >
+                  ✕
+                </button>
+
+                {/* Title */}
+                <h2 style={{
+                  fontSize: '1.75rem',
+                  fontFamily: 'Bebas Neue',
+                  color: 'var(--text-primary)',
+                  margin: '0 0 1rem 0',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
+                }}>
+                  We'd love your feedback
+                </h2>
+
+                {/* Subtitle */}
+                <p style={{
+                  fontSize: '0.95rem',
+                  fontFamily: 'DM Sans',
+                  color: 'var(--text-secondary)',
+                  margin: '0 0 1.5rem 0',
+                  lineHeight: 1.6,
+                }}>
+                  Help us improve your Beer World experience by sharing your thoughts about this purchase.
+                </p>
+
+                {/* Text Area */}
+                <textarea
+                  value={feedbackText}
+                  onChange={(e) => setFeedbackText(e.target.value)}
+                  placeholder="Tell us about your experience..."
+                  style={{
+                    width: '100%',
+                    minHeight: '120px',
+                    padding: '1rem',
+                    backgroundColor: 'var(--background-tertiary)',
+                    border: '1px solid var(--border-medium)',
+                    color: 'var(--text-primary)',
+                    fontFamily: 'DM Sans',
+                    fontSize: '0.95rem',
+                    borderRadius: '8px',
+                    boxSizing: 'border-box',
+                    resize: 'vertical',
+                    transition: 'border-color 200ms ease',
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = 'var(--accent-amber)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'var(--border-medium)';
+                  }}
+                />
+
+                {/* Submit Button */}
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowFeedbackDialog(false)}
+                  style={{
+                    width: '100%',
+                    marginTop: '1.5rem',
+                    padding: '0.75rem 1.5rem',
+                    backgroundColor: 'var(--accent-amber)',
+                    color: 'var(--background-primary)',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '0.95rem',
+                    fontFamily: 'Bebas Neue',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    transition: 'all 200ms ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--accent-amber-light)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--accent-amber)';
+                  }}
+                >
+                  Thank you!
+                </motion.button>
+
+                {/* Skip option */}
+                <p style={{
+                  fontSize: '0.75rem',
+                  fontFamily: 'DM Sans',
+                  color: 'var(--text-muted)',
+                  textAlign: 'center',
+                  margin: '1rem 0 0 0',
+                }}>
+                  or close this dialog to continue
+                </p>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </div>
     );
   }
@@ -596,10 +805,10 @@ export default function CheckoutPage() {
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '3rem 2rem',
+        padding: isMobile ? '1.5rem 1rem' : '3rem 2rem',
         display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '3rem',
+        gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+        gap: isMobile ? '2rem' : '3rem',
       }}>
         {/* Left Column - Basket Summary */}
         <div>
@@ -1119,7 +1328,7 @@ export default function CheckoutPage() {
               </h3>
 
               {/* First Name + Last Name */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                 <div>
                   <label style={{
                     display: 'block',
@@ -1274,7 +1483,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* City + Postcode */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                 <div>
                   <label style={{
                     display: 'block',
@@ -1516,7 +1725,7 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Expiry + CVV */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
                   <div>
                     <label style={{
                       display: 'block',

@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import Cookies from 'js-cookie';
 import { useBasket } from '../hooks/useBasket';
 import { useScrollRestoration } from '../hooks/useScrollRestoration';
+import { useResponsive } from '../hooks/useResponsive';
 import beers from '../data/beers.json';
 import brewers from '../data/brewers.json';
 import quizConfig from '../data/quizConfig.json';
@@ -33,6 +34,7 @@ export default function DiscoveryPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { addItem } = useBasket();
+  const isMobile = useResponsive(768);
 
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [selectedMood, setSelectedMood] = useState(null);
@@ -43,6 +45,7 @@ export default function DiscoveryPage() {
   const [recentlyAddedBeers, setRecentlyAddedBeers] = useState(new Set());
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
 
   // Load profile from cookie
   useEffect(() => {
@@ -182,7 +185,7 @@ export default function DiscoveryPage() {
       mood: selectedMood,
       searchQuery: searchQuery,
     });
-    navigate(`/brewer/${beer.brewerId}?from=discover&beerId=${beer.id}`);
+    navigate(`/beer/${beer.id}`);
   };
 
   const handleClearSearch = () => {
@@ -343,7 +346,7 @@ export default function DiscoveryPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
         style={{
-          padding: '2rem',
+          padding: isMobile ? '1rem' : '2rem',
           backgroundColor: 'var(--background-primary)',
         }}
       >
@@ -351,12 +354,13 @@ export default function DiscoveryPage() {
           <div style={{
             display: 'flex',
             gap: '1rem',
-            alignItems: 'center',
+            alignItems: isMobile ? 'stretch' : 'center',
             justifyContent: 'center',
-            flexWrap: 'nowrap',
+            flexWrap: isMobile ? 'wrap' : 'nowrap',
+            flexDirection: isMobile ? 'column' : 'row',
           }}>
             {/* Search Bar */}
-            <div style={{ flex: '0 0 350px' }}>
+            <div style={{ flex: isMobile ? '1 1 100%' : '0 0 350px' }}>
               <SearchBar
                 onChange={handleSearchChange}
                 variant="full"
@@ -364,16 +368,53 @@ export default function DiscoveryPage() {
               />
             </div>
 
+            {/* Filters Toggle Button (Mobile Only) */}
+            {isMobile && (
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                style={{
+                  backgroundColor: showFilters ? 'var(--accent-amber)' : 'transparent',
+                  color: showFilters ? 'var(--background-primary)' : 'var(--text-secondary)',
+                  border: `1px solid ${showFilters ? 'var(--accent-amber)' : 'var(--border-medium)'}`,
+                  padding: '0.5rem 1rem',
+                  borderRadius: '20px',
+                  fontSize: '0.875rem',
+                  fontFamily: 'DM Sans',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 200ms ease',
+                  whiteSpace: 'nowrap',
+                }}
+                onMouseEnter={(e) => {
+                  if (!showFilters) {
+                    e.currentTarget.style.borderColor = 'var(--accent-amber)';
+                    e.currentTarget.style.color = 'var(--accent-amber)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!showFilters) {
+                    e.currentTarget.style.borderColor = 'var(--border-medium)';
+                    e.currentTarget.style.color = 'var(--text-secondary)';
+                  }
+                }}
+              >
+                {showFilters ? '✕ Hide Filters' : 'Filters'}
+              </button>
+            )}
+
             {/* Mood filter pills */}
-            <div style={{
-              display: 'flex',
-              gap: '0.75rem',
-              overflowX: 'auto',
-              paddingBottom: '0.5rem',
-              scrollBehavior: 'smooth',
-              flex: '1 1 auto',
-              minWidth: 0,
-            }}>
+            {(!isMobile || showFilters) && (
+              <div style={{
+                display: 'flex',
+                gap: '0.75rem',
+                overflowX: isMobile ? 'visible' : 'auto',
+                paddingBottom: isMobile ? '0' : '0.5rem',
+                scrollBehavior: 'smooth',
+                flex: isMobile ? '1 1 100%' : '1 1 auto',
+                minWidth: 0,
+                flexWrap: isMobile ? 'wrap' : 'nowrap',
+                justifyContent: isMobile ? 'flex-start' : 'flex-start',
+              }}>
               <button
                 onClick={() => {
                   setSelectedMood(null);
@@ -442,12 +483,13 @@ export default function DiscoveryPage() {
                 </button>
               ))}
             </div>
+            )}
           </div>
         </div>
       </motion.section>
 
       {/* Beer Grid or No Results */}
-      <section style={{ padding: '0.5rem 2rem 2rem 2rem', backgroundColor: 'var(--background-primary)' }}>
+      <section style={{ padding: isMobile ? '0.5rem 1rem 1rem 1rem' : '0.5rem 2rem 2rem 2rem', backgroundColor: 'var(--background-primary)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           {filteredBeers.length === 0 ? (
             <motion.div
@@ -485,8 +527,8 @@ export default function DiscoveryPage() {
               transition={{ duration: 0.3 }}
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                gap: '2rem',
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))',
+                gap: isMobile ? '1rem' : '2rem',
               }}
             >
               {filteredBeers.map((beer, index) => {

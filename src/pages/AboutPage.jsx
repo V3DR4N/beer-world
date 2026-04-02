@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
+import { useResponsive } from '../hooks/useResponsive';
 
 export default function AboutPage() {
+  const isMobile = useResponsive(768);
   return (
     <div style={{ backgroundColor: 'var(--background-primary)', minHeight: '100vh' }}>
       {/* Hero Section */}
@@ -103,8 +105,8 @@ export default function AboutPage() {
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '2rem',
+            gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: isMobile ? '1rem' : '2rem',
           }}>
             {/* Card 1 */}
             <motion.div
