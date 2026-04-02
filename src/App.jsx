@@ -5,6 +5,7 @@ import { PreferencesProvider } from './context/PreferencesContext';
 import { BasketProvider } from './context/BasketContext';
 import { BrewerSessionProvider } from './context/BrewerSessionContext';
 import { AdminSessionProvider } from './context/AdminSessionContext';
+import { useScrollRestoration } from './hooks/useScrollRestoration';
 
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
@@ -54,10 +55,16 @@ function AppContent() {
   const isBrewerPortal = location.pathname.startsWith('/brewer-portal');
   const isAdmin = location.pathname === '/admin';
   const hideHeader = location.pathname === '/quiz' || location.pathname === '/login' || location.pathname === '/register' || isBrewerPortal || isAdmin;
+  const { shouldRestoreScroll, clearScrollState } = useScrollRestoration();
 
-  // Scroll to top on route change
+  // Scroll to top on route change, unless restoring from saved state
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (!shouldRestoreScroll()) {
+      window.scrollTo(0, 0);
+    } else {
+      // Clear the flag after checking so subsequent navigations scroll to top
+      clearScrollState();
+    }
   }, [location.pathname]);
 
   return (

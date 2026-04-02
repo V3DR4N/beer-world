@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBasket } from '../hooks/useBasket';
+import { useScrollRestoration } from '../hooks/useScrollRestoration';
 import brewers from '../data/brewers.json';
 import beers from '../data/beers.json';
 import RatingDisplay from '../components/ui/RatingDisplay';
@@ -31,6 +32,18 @@ export default function BrewerPage() {
   // Check if coming from discover page
   const fromDiscover = searchParams.get('from') === 'discover';
   const selectedBeerId = searchParams.get('beerId');
+
+  // Restore scroll position when coming back from beer detail
+  useEffect(() => {
+    const { restoreScrollState } = useScrollRestoration();
+    const restored = restoreScrollState();
+
+    if (restored && restored.sourceRoute.startsWith('/brewer/')) {
+      setTimeout(() => {
+        window.scrollTo(0, restored.scrollPosition);
+      }, 100);
+    }
+  }, [brewerId]);
 
   // Find brewer
   const brewer = useMemo(() => {
@@ -512,6 +525,43 @@ export default function BrewerPage() {
                   </p>
                 </div>
 
+                {/* Back Button */}
+                <button
+                  onClick={() => {
+                    const { restoreScrollState } = useScrollRestoration();
+                    const restored = restoreScrollState();
+                    navigate(-1);
+                    if (restored && restored.scrollPosition !== undefined) {
+                      setTimeout(() => {
+                        window.scrollTo(0, restored.scrollPosition);
+                      }, 100);
+                    }
+                  }}
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: 'var(--text-secondary)',
+                    border: '1px solid var(--border-subtle)',
+                    padding: '0.4rem 0.8rem',
+                    fontSize: '0.8rem',
+                    fontFamily: 'DM Sans',
+                    fontWeight: '600',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    transition: 'all 200ms ease',
+                    marginBottom: '1rem',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--accent-amber)';
+                    e.currentTarget.style.color = 'var(--accent-amber)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                    e.currentTarget.style.color = 'var(--text-secondary)';
+                  }}
+                >
+                  ← Back
+                </button>
+
                 {/* Description */}
                 <div style={{ marginBottom: '1.5rem' }}>
                   <p style={{
@@ -856,7 +906,11 @@ export default function BrewerPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
-              onClick={() => navigate(`/brewer/${brewerId}?beerId=${beer.id}`)}
+              onClick={() => {
+                const { saveScrollState } = useScrollRestoration();
+                saveScrollState(`/brewer/${brewerId}`, window.scrollY, {});
+                navigate(`/brewer/${brewerId}?beerId=${beer.id}`);
+              }}
               style={{
                 backgroundColor: 'var(--background-secondary)',
                 borderRadius: '12px',

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Cookies from 'js-cookie';
 import { useBasket } from '../hooks/useBasket';
+import { useScrollRestoration } from '../hooks/useScrollRestoration';
 import beers from '../data/beers.json';
 import brewers from '../data/brewers.json';
 import quizConfig from '../data/quizConfig.json';
@@ -58,6 +59,27 @@ export default function DiscoveryPage() {
       }
     } else {
       setHasQuizProfile(false);
+    }
+  }, []);
+
+  // Restore scroll position and filters when coming back from beer detail
+  useEffect(() => {
+    const { restoreScrollState } = useScrollRestoration();
+    const restored = restoreScrollState();
+
+    if (restored && restored.sourceRoute === '/discover') {
+      // Restore mood filter
+      if (restored.discoveryFilters.mood) {
+        setSelectedMood(restored.discoveryFilters.mood);
+      }
+      // Restore search query
+      if (restored.discoveryFilters.searchQuery) {
+        setSearchQuery(restored.discoveryFilters.searchQuery);
+      }
+      // Restore scroll position
+      setTimeout(() => {
+        window.scrollTo(0, restored.scrollPosition);
+      }, 100);
     }
   }, []);
 
@@ -153,6 +175,11 @@ export default function DiscoveryPage() {
   };
 
   const handleBeerClick = (beer) => {
+    const { saveScrollState } = useScrollRestoration();
+    saveScrollState('/discover', window.scrollY, {
+      mood: selectedMood,
+      searchQuery: searchQuery,
+    });
     navigate(`/brewer/${beer.brewerId}?from=discover&beerId=${beer.id}`);
   };
 
