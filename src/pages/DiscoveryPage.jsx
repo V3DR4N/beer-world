@@ -64,7 +64,7 @@ export default function DiscoveryPage() {
 
   // Restore scroll position and filters when coming back from beer detail
   useEffect(() => {
-    const { restoreScrollState } = useScrollRestoration();
+    const { restoreScrollState, clearScrollState } = useScrollRestoration();
     const restored = restoreScrollState();
 
     if (restored && restored.sourceRoute === '/discover') {
@@ -79,6 +79,8 @@ export default function DiscoveryPage() {
       // Restore scroll position
       setTimeout(() => {
         window.scrollTo(0, restored.scrollPosition);
+        // Clear the saved state after restoring so future navigations scroll to top
+        clearScrollState();
       }, 100);
     }
   }, []);

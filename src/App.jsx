@@ -55,15 +55,14 @@ function AppContent() {
   const isBrewerPortal = location.pathname.startsWith('/brewer-portal');
   const isAdmin = location.pathname === '/admin';
   const hideHeader = location.pathname === '/quiz' || location.pathname === '/login' || location.pathname === '/register' || isBrewerPortal || isAdmin;
-  const { shouldRestoreScroll, clearScrollState } = useScrollRestoration();
+  const { shouldRestoreScroll } = useScrollRestoration();
 
   // Scroll to top on route change, unless restoring from saved state
   useEffect(() => {
+    // Only scroll to top if we're not restoring scroll state
+    // Page components will handle restoration and clearing the state
     if (!shouldRestoreScroll()) {
       window.scrollTo(0, 0);
-    } else {
-      // Clear the flag after checking so subsequent navigations scroll to top
-      clearScrollState();
     }
   }, [location.pathname]);
 

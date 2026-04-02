@@ -35,12 +35,14 @@ export default function BrewerPage() {
 
   // Restore scroll position when coming back from beer detail
   useEffect(() => {
-    const { restoreScrollState } = useScrollRestoration();
+    const { restoreScrollState, clearScrollState } = useScrollRestoration();
     const restored = restoreScrollState();
 
     if (restored && restored.sourceRoute.startsWith('/brewer/')) {
       setTimeout(() => {
         window.scrollTo(0, restored.scrollPosition);
+        // Clear the saved state after restoring so future navigations scroll to top
+        clearScrollState();
       }, 100);
     }
   }, [brewerId]);
