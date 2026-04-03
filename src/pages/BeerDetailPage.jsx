@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useBasket } from '../hooks/useBasket';
 import { useScrollRestoration } from '../hooks/useScrollRestoration';
 import { useResponsive } from '../hooks/useResponsive';
+import { getStock } from '../utils/stockManager';
 import beers from '../data/beers.json';
 import brewers from '../data/brewers.json';
 import RatingDisplay from '../components/ui/RatingDisplay';
@@ -468,39 +469,46 @@ export default function BeerDetailPage() {
             </div>
 
             {/* Add to Cart Button */}
-            <button
-              onClick={() => handleAddToBasket(beer)}
-              disabled={recentlyAddedBeers.has(beer.id)}
-              style={{
-                width: '100%',
-                padding: '0.75rem',
-                backgroundColor: recentlyAddedBeers.has(beer.id)
-                  ? 'var(--background-tertiary)'
-                  : 'var(--accent-amber)',
-                color: recentlyAddedBeers.has(beer.id)
-                  ? 'var(--text-muted)'
-                  : 'var(--background-primary)',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '0.95rem',
-                fontFamily: 'DM Sans',
-                fontWeight: '600',
-                cursor: recentlyAddedBeers.has(beer.id) ? 'not-allowed' : 'pointer',
-                transition: 'all 200ms ease',
-              }}
-              onMouseEnter={(e) => {
-                if (!recentlyAddedBeers.has(beer.id)) {
-                  e.currentTarget.style.backgroundColor = 'var(--accent-amber-light)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!recentlyAddedBeers.has(beer.id)) {
-                  e.currentTarget.style.backgroundColor = 'var(--accent-amber)';
-                }
-              }}
-            >
-              {recentlyAddedBeers.has(beer.id) ? 'Added to cart' : 'Add to cart'}
-            </button>
+            {(() => {
+              const currentStock = getStock(beer.id);
+              const inStock = currentStock > 0;
+
+              return (
+              <button
+                onClick={() => handleAddToBasket(beer)}
+                disabled={!inStock || recentlyAddedBeers.has(beer.id)}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  backgroundColor: recentlyAddedBeers.has(beer.id)
+                    ? 'var(--background-tertiary)'
+                    : inStock ? 'var(--accent-amber)' : 'var(--background-tertiary)',
+                  color: recentlyAddedBeers.has(beer.id)
+                    ? 'var(--text-muted)'
+                    : inStock ? 'var(--background-primary)' : 'var(--text-muted)',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '0.95rem',
+                  fontFamily: 'DM Sans',
+                  fontWeight: '600',
+                  cursor: (inStock && !recentlyAddedBeers.has(beer.id)) ? 'pointer' : 'not-allowed',
+                  transition: 'all 200ms ease',
+                }}
+                onMouseEnter={(e) => {
+                  if (inStock && !recentlyAddedBeers.has(beer.id)) {
+                    e.currentTarget.style.backgroundColor = 'var(--accent-amber-light)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (inStock && !recentlyAddedBeers.has(beer.id)) {
+                    e.currentTarget.style.backgroundColor = 'var(--accent-amber)';
+                  }
+                }}
+              >
+                {recentlyAddedBeers.has(beer.id) ? 'Added to cart' : inStock ? 'Add to cart' : 'Out of stock'}
+              </button>
+              );
+            })()}
           </div>
         </div>
 

@@ -621,7 +621,11 @@ export default function BrewerPage() {
             gap: isMobile ? '1rem' : '2rem',
           }}
         >
-          {brewerBeers.map((beer, index) => (
+          {brewerBeers.map((beer, index) => {
+            const currentStock = getStock(beer.id);
+            const inStock = currentStock > 0;
+
+            return (
             <motion.div
               key={beer.id}
               initial={{ opacity: 0, y: 20 }}
@@ -639,7 +643,8 @@ export default function BrewerPage() {
                 overflow: 'hidden',
                 cursor: 'pointer',
                 transition: 'all 200ms ease',
-                opacity: beer.inStock ? 1 : 0.6,
+                opacity: inStock ? 1 : 0.6,
+                position: 'relative',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = 'var(--accent-amber)';
@@ -657,6 +662,25 @@ export default function BrewerPage() {
                 position: 'relative',
                 backgroundColor: 'var(--background-tertiary)',
               }}>
+                {/* Out of Stock Label */}
+                {!inStock && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '1rem',
+                    right: '1rem',
+                    backgroundColor: 'rgba(192, 57, 43, 0.95)',
+                    color: 'white',
+                    padding: '0.4rem 0.8rem',
+                    borderRadius: '4px',
+                    fontSize: '0.75rem',
+                    fontFamily: 'DM Sans',
+                    fontWeight: '700',
+                    textTransform: 'uppercase',
+                    zIndex: 10,
+                  }}>
+                    Out of Stock
+                  </div>
+                )}
                 {failedImages.has(beer.id) ? (
                   <div style={{
                     position: 'absolute',
@@ -791,18 +815,18 @@ export default function BrewerPage() {
                     e.stopPropagation();
                     handleAddToBasket(beer);
                   }}
-                  disabled={!beer.inStock || recentlyAddedBeers.has(beer.id)}
+                  disabled={!inStock || recentlyAddedBeers.has(beer.id)}
                   style={{
                     width: '100%',
                     padding: '0.75rem',
                     backgroundColor: recentlyAddedBeers.has(beer.id)
                       ? 'var(--background-tertiary)'
-                      : beer.inStock
+                      : inStock
                       ? 'var(--accent-amber)'
                       : 'var(--background-tertiary)',
                     color: recentlyAddedBeers.has(beer.id)
                       ? 'var(--text-muted)'
-                      : beer.inStock
+                      : inStock
                       ? 'var(--background-primary)'
                       : 'var(--text-muted)',
                     border: 'none',
@@ -810,25 +834,26 @@ export default function BrewerPage() {
                     fontSize: '0.95rem',
                     fontFamily: 'DM Sans',
                     fontWeight: '600',
-                    cursor: (beer.inStock && !recentlyAddedBeers.has(beer.id)) ? 'pointer' : 'not-allowed',
+                    cursor: (inStock && !recentlyAddedBeers.has(beer.id)) ? 'pointer' : 'not-allowed',
                     transition: 'all 200ms ease',
                   }}
                   onMouseEnter={(e) => {
-                    if (beer.inStock && !recentlyAddedBeers.has(beer.id)) {
+                    if (inStock && !recentlyAddedBeers.has(beer.id)) {
                       e.currentTarget.style.backgroundColor = 'var(--accent-amber-light)';
                     }
                   }}
                   onMouseLeave={(e) => {
-                    if (beer.inStock && !recentlyAddedBeers.has(beer.id)) {
+                    if (inStock && !recentlyAddedBeers.has(beer.id)) {
                       e.currentTarget.style.backgroundColor = 'var(--accent-amber)';
                     }
                   }}
                 >
-                  {recentlyAddedBeers.has(beer.id) ? 'Added to cart' : beer.inStock ? 'Add to cart' : 'Notify me'}
+                  {recentlyAddedBeers.has(beer.id) ? 'Added to cart' : inStock ? 'Add to cart' : 'Out of stock'}
                 </button>
               </div>
             </motion.div>
-          ))}
+            );
+          })}
         </motion.div>
       </motion.section>
 
