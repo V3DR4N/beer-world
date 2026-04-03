@@ -5,6 +5,7 @@ import { BrewerSessionContext } from '../../context/BrewerSessionContext';
 const SECTIONS = [
   { key: 'overview', label: 'OVERVIEW' },
   { key: 'my-beers', label: 'MY BEERS' },
+  { key: 'inventory', label: 'INVENTORY' },
   { key: 'profile', label: 'BREWERY PROFILE' },
   { key: 'orders', label: 'ORDERS' },
 ];

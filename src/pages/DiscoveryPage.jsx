@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 import { useBasket } from '../hooks/useBasket';
 import { useScrollRestoration } from '../hooks/useScrollRestoration';
 import { useResponsive } from '../hooks/useResponsive';
+import { getStock } from '../utils/stockManager';
 import beers from '../data/beers.json';
 import brewers from '../data/brewers.json';
 import quizConfig from '../data/quizConfig.json';
@@ -535,6 +536,8 @@ export default function DiscoveryPage() {
                 const brewer = getBrewer(beer.brewerId);
                 const imageUrl = beer.imageUrl;
                 const imageFailedToLoad = failedImages.has(beer.id);
+                const currentStock = getStock(beer.id);
+                const inStock = currentStock > 0;
 
                 return (
                   <motion.div
@@ -550,7 +553,8 @@ export default function DiscoveryPage() {
                       overflow: 'hidden',
                       cursor: 'pointer',
                       transition: 'all 200ms ease',
-                      opacity: beer.inStock ? 1 : 0.6,
+                      opacity: inStock ? 1 : 0.6,
+                      position: 'relative',
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.borderColor = 'var(--accent-amber)';
@@ -568,6 +572,25 @@ export default function DiscoveryPage() {
                       position: 'relative',
                       backgroundColor: 'var(--background-tertiary)',
                     }}>
+                      {/* Out of Stock Label */}
+                      {!inStock && (
+                        <div style={{
+                          position: 'absolute',
+                          top: '1rem',
+                          right: '1rem',
+                          backgroundColor: 'rgba(192, 57, 43, 0.95)',
+                          color: 'white',
+                          padding: '0.4rem 0.8rem',
+                          borderRadius: '4px',
+                          fontSize: '0.75rem',
+                          fontFamily: 'DM Sans',
+                          fontWeight: '700',
+                          textTransform: 'uppercase',
+                          zIndex: 10,
+                        }}>
+                          Out of Stock
+                        </div>
+                      )}
                       {imageFailedToLoad ? (
                         <div style={{
                           position: 'absolute',
@@ -699,36 +722,36 @@ export default function DiscoveryPage() {
                       {/* Button */}
                       <button
                         onClick={(e) => handleAddToBasket(e, beer)}
-                        disabled={!beer.inStock || recentlyAddedBeers.has(beer.id)}
+                        disabled={!inStock || recentlyAddedBeers.has(beer.id)}
                         style={{
                           width: '100%',
                           padding: '0.75rem',
                           backgroundColor: recentlyAddedBeers.has(beer.id)
                             ? 'var(--background-tertiary)'
-                            : beer.inStock ? 'var(--accent-amber)' : 'var(--background-tertiary)',
+                            : inStock ? 'var(--accent-amber)' : 'var(--background-tertiary)',
                           color: recentlyAddedBeers.has(beer.id)
                             ? 'var(--text-muted)'
-                            : beer.inStock ? 'var(--background-primary)' : 'var(--text-muted)',
+                            : inStock ? 'var(--background-primary)' : 'var(--text-muted)',
                           border: 'none',
                           borderRadius: '6px',
                           fontSize: '0.95rem',
                           fontFamily: 'DM Sans',
                           fontWeight: '600',
-                          cursor: (beer.inStock && !recentlyAddedBeers.has(beer.id)) ? 'pointer' : 'not-allowed',
+                          cursor: (inStock && !recentlyAddedBeers.has(beer.id)) ? 'pointer' : 'not-allowed',
                           transition: 'all 200ms ease',
                         }}
                         onMouseEnter={(e) => {
-                          if (beer.inStock && !recentlyAddedBeers.has(beer.id)) {
+                          if (inStock && !recentlyAddedBeers.has(beer.id)) {
                             e.currentTarget.style.backgroundColor = 'var(--accent-amber-light)';
                           }
                         }}
                         onMouseLeave={(e) => {
-                          if (beer.inStock && !recentlyAddedBeers.has(beer.id)) {
+                          if (inStock && !recentlyAddedBeers.has(beer.id)) {
                             e.currentTarget.style.backgroundColor = 'var(--accent-amber)';
                           }
                         }}
                       >
-                        {recentlyAddedBeers.has(beer.id) ? 'Added to cart' : beer.inStock ? 'Add to cart' : 'Notify me'}
+                        {recentlyAddedBeers.has(beer.id) ? 'Added to cart' : inStock ? 'Add to cart' : 'Out of stock'}
                       </button>
                     </div>
                   </motion.div>

@@ -5,6 +5,7 @@ import DashboardOverview from '../components/brewer-portal/DashboardOverview';
 import MyBeersSection from '../components/brewer-portal/MyBeersSection';
 import BreweryProfileSection from '../components/brewer-portal/BreweryProfileSection';
 import OrdersSection from '../components/brewer-portal/OrdersSection';
+import InventorySection from '../components/brewer-portal/InventorySection';
 
 export default function BrewerPortalDashboard() {
   const [activeSection, setActiveSection] = useState('overview');
@@ -16,6 +17,8 @@ export default function BrewerPortalDashboard() {
         return <DashboardOverview />;
       case 'my-beers':
         return <MyBeersSection />;
+      case 'inventory':
+        return <InventorySection />;
       case 'profile':
         return <BreweryProfileSection />;
       case 'orders':

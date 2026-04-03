@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { useBasket } from '../hooks/useBasket';
 import { useResponsive } from '../hooks/useResponsive';
+import { initializeStock, reduceStockForOrder } from '../utils/stockManager';
 import beers from '../data/beers.json';
 import brewers from '../data/brewers.json';
 
@@ -90,8 +91,11 @@ export default function CheckoutPage() {
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const [feedbackText, setFeedbackText] = useState('');
 
-  // Check if user is already logged in on mount
+  // Initialize stock and check if user is already logged in on mount
   useEffect(() => {
+    // Initialize stock from mock data
+    initializeStock(beers);
+
     const sessionStr = localStorage.getItem('beerworld_session');
     if (sessionStr) {
       try {
@@ -157,6 +161,9 @@ export default function CheckoutPage() {
           email,
         })
       );
+
+      // Deduct stock for each item in order
+      reduceStockForOrder(items);
 
       // Clear basket on successful order
       clearBasket();

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useBasket } from '../hooks/useBasket';
 import { useScrollRestoration } from '../hooks/useScrollRestoration';
 import { useResponsive } from '../hooks/useResponsive';
+import { getStock } from '../utils/stockManager';
 import brewers from '../data/brewers.json';
 import beers from '../data/beers.json';
 import RatingDisplay from '../components/ui/RatingDisplay';

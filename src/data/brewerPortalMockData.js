@@ -17,6 +17,7 @@ export const BREWER_BEERS = [
     volume: 500,
     price: 5.20,
     inStock: true,
+    stock: 45,
   },
   {
     id: "beer-2",
@@ -26,6 +27,7 @@ export const BREWER_BEERS = [
     volume: 500,
     price: 5.80,
     inStock: true,
+    stock: 18,
   },
   {
     id: "beer-3",
@@ -35,6 +37,7 @@ export const BREWER_BEERS = [
     volume: 500,
     price: 6.20,
     inStock: false,
+    stock: 0,
   },
 ];
 
