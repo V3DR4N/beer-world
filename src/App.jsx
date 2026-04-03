@@ -6,6 +6,8 @@ import { BasketProvider } from './context/BasketContext';
 import { BrewerSessionProvider } from './context/BrewerSessionContext';
 import { AdminSessionProvider } from './context/AdminSessionContext';
 import { useScrollRestoration } from './hooks/useScrollRestoration';
+import { initializeStock } from './utils/stockManager';
+import beers from './data/beers.json';
 
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
@@ -57,6 +59,11 @@ function AppContent() {
   const isAdmin = location.pathname === '/admin';
   const hideHeader = location.pathname === '/quiz' || location.pathname === '/login' || location.pathname === '/register' || isBrewerPortal || isAdmin;
   const { shouldRestoreScroll } = useScrollRestoration();
+
+  // Initialize stock from beers data on app load
+  useEffect(() => {
+    initializeStock(beers);
+  }, []);
 
   // Scroll to top on route change, unless restoring from saved state
   useEffect(() => {
