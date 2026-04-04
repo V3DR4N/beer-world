@@ -821,7 +821,7 @@ export default function AdminPage() {
               gap: '1.5rem',
               marginBottom: '2rem',
             }}>
-              {analyticsData ? [
+              {(analyticsData ? [
                 { label: 'Active Breweries', value: '3' },
                 { label: 'Total Orders', value: analyticsData.totalMetrics.totalOrders },
                 { label: 'Registered Consumers', value: analyticsData.totalMetrics.totalCustomers },
@@ -831,7 +831,7 @@ export default function AdminPage() {
                 { label: 'Total Orders', value: '—' },
                 { label: 'Registered Consumers', value: '—' },
                 { label: 'Gross GMV', value: '—' },
-              ].map((stat, idx) => (
+              ]).map((stat, idx) => (
                 <motion.div
                   key={idx}
                   initial={{ y: 20, opacity: 0 }}
@@ -875,13 +875,13 @@ export default function AdminPage() {
               gap: '1.5rem',
               marginBottom: '2rem',
             }}>
-              {analyticsData ? [
+              {(analyticsData ? [
                 { label: 'Avg Order Value', value: `€${analyticsData.totalMetrics.avgOrderValue.toLocaleString('de-DE', { minimumFractionDigits: 2 })}` },
                 { label: 'Repeat Order Rate', value: `${analyticsData.repeatPurchaseRate.rate}%` },
               ] : [
                 { label: 'Avg Order Value', value: '—' },
                 { label: 'Repeat Order Rate', value: '—' },
-              ].map((stat, idx) => (
+              ]).map((stat, idx) => (
                 <motion.div
                   key={idx}
                   initial={{ y: 20, opacity: 0 }}
