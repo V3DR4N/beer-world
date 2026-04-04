@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useResponsive } from '../hooks/useResponsive';
 import { AdminSessionContext } from '../context/AdminSessionContext';
+import { initializeMockOrders, getOrdersFromStorage } from '../utils/mockOrdersData';
+import { getAllAnalytics, getDateRange } from '../utils/analyticsManager';
 
 const MOCK_INVITATIONS = [
   { id: 1, breweryName: 'De Wilde Hop', contactName: 'Lena Vandermeersch', country: 'Belgium', status: 'Live', dateInvited: '15 Jan 2026' },
@@ -42,6 +44,10 @@ export default function AdminPage() {
   const [email, setEmail] = useState('');
   const [country, setCountry] = useState('Netherlands');
 
+  // Analytics states
+  const [selectedDateRange, setSelectedDateRange] = useState('last30');
+  const [analyticsData, setAnalyticsData] = useState(null);
+
   // Load invitations from localStorage
   useEffect(() => {
     const stored = localStorage.getItem('beerworld_invitations');
@@ -56,6 +62,15 @@ export default function AdminPage() {
       localStorage.setItem('beerworld_invitations', JSON.stringify(MOCK_INVITATIONS));
     }
   }, []);
+
+  // Initialize mock orders and calculate analytics
+  useEffect(() => {
+    initializeMockOrders();
+    const orders = getOrdersFromStorage();
+    const { startDate, endDate } = getDateRange(selectedDateRange);
+    const analytics = getAllAnalytics(orders, startDate, endDate);
+    setAnalyticsData(analytics);
+  }, [selectedDateRange]);
 
   const handleInviteSubmit = (e) => {
     e.preventDefault();
@@ -749,6 +764,56 @@ export default function AdminPage() {
               </p>
             </div>
 
+            {/* Date Range Selector */}
+            {analyticsData && (
+              <div style={{
+                display: 'flex',
+                gap: '1rem',
+                marginBottom: '2rem',
+                flexWrap: 'wrap',
+              }}>
+                {[
+                  { label: 'Last 7 Days', value: 'last7' },
+                  { label: 'Last 30 Days', value: 'last30' },
+                  { label: 'Last 90 Days', value: 'last90' },
+                  { label: 'All Time', value: 'all' },
+                ].map((range) => (
+                  <button
+                    key={range.value}
+                    onClick={() => setSelectedDateRange(range.value)}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      backgroundColor: selectedDateRange === range.value
+                        ? 'var(--accent-amber)'
+                        : 'var(--background-secondary)',
+                      color: selectedDateRange === range.value
+                        ? 'var(--background-primary)'
+                        : 'var(--text-primary)',
+                      border: `1px solid ${selectedDateRange === range.value ? 'var(--accent-amber)' : 'var(--border-subtle)'}`,
+                      borderRadius: '6px',
+                      fontFamily: 'DM Sans',
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      transition: 'all 200ms ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      if (selectedDateRange !== range.value) {
+                        e.currentTarget.style.borderColor = 'var(--accent-amber)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (selectedDateRange !== range.value) {
+                        e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                      }
+                    }}
+                  >
+                    {range.label}
+                  </button>
+                ))}
+              </div>
+            )}
+
             {/* Stat Cards - Row 1 */}
             <div style={{
               display: 'grid',
@@ -756,11 +821,16 @@ export default function AdminPage() {
               gap: '1.5rem',
               marginBottom: '2rem',
             }}>
-              {[
+              {analyticsData ? [
                 { label: 'Active Breweries', value: '3' },
-                { label: 'Registered Consumers', value: '1,284' },
-                { label: 'Total Orders', value: '847' },
-                { label: 'Gross GMV', value: '€12,406' },
+                { label: 'Total Orders', value: analyticsData.totalMetrics.totalOrders },
+                { label: 'Registered Consumers', value: analyticsData.totalMetrics.totalCustomers },
+                { label: 'Gross GMV', value: `€${analyticsData.totalMetrics.totalGMV.toLocaleString('de-DE', { minimumFractionDigits: 2 })}` },
+              ] : [
+                { label: 'Active Breweries', value: '—' },
+                { label: 'Total Orders', value: '—' },
+                { label: 'Registered Consumers', value: '—' },
+                { label: 'Gross GMV', value: '—' },
               ].map((stat, idx) => (
                 <motion.div
                   key={idx}
@@ -805,9 +875,12 @@ export default function AdminPage() {
               gap: '1.5rem',
               marginBottom: '2rem',
             }}>
-              {[
-                { label: 'Avg Order Value', value: '€14.65' },
-                { label: 'Repeat Order Rate', value: '28%' },
+              {analyticsData ? [
+                { label: 'Avg Order Value', value: `€${analyticsData.totalMetrics.avgOrderValue.toLocaleString('de-DE', { minimumFractionDigits: 2 })}` },
+                { label: 'Repeat Order Rate', value: `${analyticsData.repeatPurchaseRate.rate}%` },
+              ] : [
+                { label: 'Avg Order Value', value: '—' },
+                { label: 'Repeat Order Rate', value: '—' },
               ].map((stat, idx) => (
                 <motion.div
                   key={idx}
@@ -844,6 +917,282 @@ export default function AdminPage() {
                 </motion.div>
               ))}
             </div>
+
+            {/* New Analytics Sections */}
+            {analyticsData && (
+              <>
+                {/* Orders per Brewery */}
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.3, delay: 0.35 }}
+                  style={{
+                    backgroundColor: 'var(--background-secondary)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '12px',
+                    padding: '1.5rem',
+                    marginBottom: '2rem',
+                  }}
+                >
+                  <h3 style={{
+                    fontSize: '1rem',
+                    fontFamily: 'DM Sans',
+                    color: 'var(--text-primary)',
+                    margin: '0 0 1rem 0',
+                    fontWeight: '600',
+                  }}>
+                    Orders per Brewery
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {Object.entries(analyticsData.ordersPerBrewery).map(([breweryId, data]) => (
+                      <div key={breweryId} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <div style={{ flex: 1 }}>
+                          <p style={{
+                            margin: '0 0 0.5rem 0',
+                            fontSize: '0.875rem',
+                            fontFamily: 'DM Sans',
+                            color: 'var(--text-secondary)',
+                          }}>
+                            {data.name}
+                          </p>
+                          <div style={{
+                            height: '8px',
+                            backgroundColor: 'var(--background-tertiary)',
+                            borderRadius: '4px',
+                            overflow: 'hidden',
+                          }}>
+                            <div style={{
+                              height: '100%',
+                              backgroundColor: 'var(--accent-amber)',
+                              width: `${data.percentage}%`,
+                              transition: 'width 300ms ease',
+                            }} />
+                          </div>
+                        </div>
+                        <div style={{ minWidth: '80px', textAlign: 'right' }}>
+                          <p style={{
+                            margin: 0,
+                            fontSize: '1rem',
+                            fontFamily: 'Bebas Neue',
+                            color: 'var(--accent-amber)',
+                            fontWeight: '600',
+                          }}>
+                            {data.count}
+                          </p>
+                          <p style={{
+                            margin: 0,
+                            fontSize: '0.75rem',
+                            fontFamily: 'DM Sans',
+                            color: 'var(--text-muted)',
+                          }}>
+                            {data.percentage}%
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+
+                {/* Multi-Brewery Order Rate */}
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.3, delay: 0.4 }}
+                  style={{
+                    backgroundColor: 'var(--background-secondary)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '12px',
+                    padding: '1.5rem',
+                    marginBottom: '2rem',
+                  }}
+                >
+                  <h3 style={{
+                    fontSize: '1rem',
+                    fontFamily: 'DM Sans',
+                    color: 'var(--text-primary)',
+                    margin: '0 0 1.5rem 0',
+                    fontWeight: '600',
+                  }}>
+                    Multi-Brewery Order Rate
+                  </h3>
+                  <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+                    <div>
+                      <p style={{
+                        margin: 0,
+                        fontSize: '0.875rem',
+                        fontFamily: 'DM Sans',
+                        color: 'var(--text-muted)',
+                        marginBottom: '0.5rem',
+                      }}>
+                        OF TOTAL ORDERS
+                      </p>
+                      <p style={{
+                        margin: 0,
+                        fontSize: '2.5rem',
+                        fontFamily: 'Bebas Neue',
+                        color: 'var(--accent-amber)',
+                        letterSpacing: '1px',
+                      }}>
+                        {analyticsData.multiBreweryRate.rate}%
+                      </p>
+                    </div>
+                    <div style={{ flex: 1, minWidth: '250px' }}>
+                      <p style={{
+                        margin: '0 0 1rem 0',
+                        fontSize: '0.875rem',
+                        fontFamily: 'DM Sans',
+                        color: 'var(--text-muted)',
+                        textTransform: 'uppercase',
+                      }}>
+                        Top Combinations
+                      </p>
+                      {analyticsData.multiBreweryRate.combinations.length > 0 ? (
+                        <ul style={{ margin: 0, paddingLeft: '1.5rem', fontSize: '0.875rem' }}>
+                          {analyticsData.multiBreweryRate.combinations.map((combo, idx) => (
+                            <li key={idx} style={{
+                              marginBottom: '0.5rem',
+                              color: 'var(--text-secondary)',
+                              fontFamily: 'DM Sans',
+                            }}>
+                              {combo.breweries} ({combo.count} orders)
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                          No multi-brewery orders yet
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* Avg Items per Order */}
+                <motion.div
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ duration: 0.3, delay: 0.45 }}
+                  style={{
+                    backgroundColor: 'var(--background-secondary)',
+                    border: '1px solid var(--border-subtle)',
+                    borderTop: '3px solid var(--accent-amber)',
+                    borderRadius: '12px',
+                    padding: '1.5rem',
+                    marginBottom: '2rem',
+                  }}
+                >
+                  <p style={{
+                    fontSize: '0.875rem',
+                    fontFamily: 'DM Sans',
+                    color: 'var(--text-muted)',
+                    margin: '0 0 0.75rem 0',
+                    textTransform: 'uppercase',
+                  }}>
+                    Average Items per Order
+                  </p>
+                  <p style={{
+                    fontSize: '2rem',
+                    fontFamily: 'Bebas Neue',
+                    color: 'var(--accent-amber)',
+                    margin: 0,
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                  }}>
+                    {analyticsData.avgItemsPerOrder}
+                  </p>
+                </motion.div>
+
+                {/* Order Status Distribution */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+                  gap: '1.5rem',
+                  marginBottom: '2rem',
+                }}>
+                  <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.3, delay: 0.5 }}
+                    style={{
+                      backgroundColor: 'var(--background-secondary)',
+                      border: '1px solid var(--border-subtle)',
+                      borderTop: '3px solid #22C55E',
+                      borderRadius: '12px',
+                      padding: '1.5rem',
+                    }}
+                  >
+                    <p style={{
+                      fontSize: '0.875rem',
+                      fontFamily: 'DM Sans',
+                      color: 'var(--text-muted)',
+                      margin: '0 0 0.75rem 0',
+                      textTransform: 'uppercase',
+                    }}>
+                      Successful Orders
+                    </p>
+                    <p style={{
+                      fontSize: '2rem',
+                      fontFamily: 'Bebas Neue',
+                      color: '#22C55E',
+                      margin: 0,
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                    }}>
+                      {analyticsData.orderStats.successful}
+                    </p>
+                    <p style={{
+                      fontSize: '0.75rem',
+                      fontFamily: 'DM Sans',
+                      color: 'var(--text-muted)',
+                      margin: '0.5rem 0 0 0',
+                    }}>
+                      {analyticsData.orderStats.successRate}% of total
+                    </p>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.3, delay: 0.55 }}
+                    style={{
+                      backgroundColor: 'var(--background-secondary)',
+                      border: '1px solid var(--border-subtle)',
+                      borderTop: '3px solid #EF4444',
+                      borderRadius: '12px',
+                      padding: '1.5rem',
+                    }}
+                  >
+                    <p style={{
+                      fontSize: '0.875rem',
+                      fontFamily: 'DM Sans',
+                      color: 'var(--text-muted)',
+                      margin: '0 0 0.75rem 0',
+                      textTransform: 'uppercase',
+                    }}>
+                      Failed Orders
+                    </p>
+                    <p style={{
+                      fontSize: '2rem',
+                      fontFamily: 'Bebas Neue',
+                      color: '#EF4444',
+                      margin: 0,
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                    }}>
+                      {analyticsData.orderStats.failed}
+                    </p>
+                    <p style={{
+                      fontSize: '0.75rem',
+                      fontFamily: 'DM Sans',
+                      color: 'var(--text-muted)',
+                      margin: '0.5rem 0 0 0',
+                    }}>
+                      {(100 - analyticsData.orderStats.successRate).toFixed(1)}% of total
+                    </p>
+                  </motion.div>
+                </div>
+              </>
+            )}
 
             {/* Top Performing Breweries */}
             <motion.div
