@@ -68,6 +68,23 @@ export default function BrewerPage() {
     return null;
   }, [selectedBeerId]);
 
+  // Load editable brewery content from localStorage
+  const [brewerContent, setBrewerContent] = useState(null);
+  useEffect(() => {
+    if (brewerId) {
+      const storageKey = `brewery_content_${brewerId}`;
+      const stored = localStorage.getItem(storageKey);
+      if (stored) {
+        try {
+          setBrewerContent(JSON.parse(stored));
+        } catch (e) {
+          console.error('Error loading brewery content:', e);
+          setBrewerContent(null);
+        }
+      }
+    }
+  }, [brewerId]);
+
   if (!brewer) {
     return (
       <div style={{
@@ -404,7 +421,7 @@ export default function BrewerPage() {
                 lineHeight: 1.8,
                 margin: '0 0 1.5rem 0',
               }}>
-                {brewer.story}
+                {brewerContent?.story || brewer.story}
               </p>
             </div>
 
@@ -437,7 +454,7 @@ export default function BrewerPage() {
                 lineHeight: 1.8,
                 margin: 0,
               }}>
-                {brewer.tagline}
+                {brewerContent?.philosophy || brewer.tagline}
               </p>
             </div>
           </motion.div>

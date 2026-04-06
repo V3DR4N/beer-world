@@ -538,7 +538,7 @@ export default function CheckoutPage() {
                   margin: 0,
                   fontStyle: 'italic',
                 }}>
-                  {BREWER_MESSAGES[firstBeerBrewerId] || 'Thank you for your order!'}
+                  {BREWER_MESSAGES[firstBeerBrewerId] || 'Thank you for supporting independent craft. Enjoy every sip. — Beer World'}
                 </p>
               </div>
             )}
