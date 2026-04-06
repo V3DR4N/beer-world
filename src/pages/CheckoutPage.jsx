@@ -112,7 +112,7 @@ export default function CheckoutPage() {
   const discountPercent = promoApplied ? 15 : 0;
   const subtotal = total;
   const discount = subtotal * (discountPercent / 100);
-  const delivery = Math.min(4.95, subtotal);
+  const delivery = 4.95;
   const finalTotal = subtotal - discount + delivery;
 
   const handleApplyPromo = () => {
@@ -380,38 +380,98 @@ export default function CheckoutPage() {
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
-                      fontSize: '0.95rem',
+                      fontSize: '0.8125rem',
                       fontFamily: 'DM Sans',
-                      color: 'var(--text-primary)',
+                      color: 'var(--accent-cream)',
                       marginBottom: '0.5rem',
                     }}
                   >
                     <span>{item.beerName} × {item.quantity}</span>
-                    <span>€{(item.price * item.quantity).toFixed(2)}</span>
+                    <span style={{ color: 'var(--accent-amber)' }}>€{(item.price * item.quantity).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
 
+              {/* Divider */}
               <div style={{
                 borderTop: '1px solid var(--border-subtle)',
-                paddingTop: '1rem',
                 marginBottom: '1rem',
-              }}>
+              }} />
+
+              {/* Financial Breakdown */}
+              <div style={{ marginBottom: '1rem' }}>
                 <div style={{
                   display: 'flex',
                   justifyContent: 'space-between',
-                  fontSize: '0.95rem',
+                  fontSize: '0.8125rem',
                   fontFamily: 'DM Sans',
                   color: 'var(--text-secondary)',
                   marginBottom: '0.5rem',
                 }}>
-                  <span>Delivery address:</span>
+                  <span>Subtotal</span>
+                  <span style={{ color: 'var(--accent-cream)' }}>€{subtotal.toFixed(2)}</span>
+                </div>
+
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  fontSize: '0.8125rem',
+                  fontFamily: 'DM Sans',
+                  color: 'var(--text-secondary)',
+                  marginBottom: '0.5rem',
+                }}>
+                  <span>VAT included (21%)</span>
+                  <span style={{ color: 'var(--accent-cream)' }}>€{(subtotal * 0.1736).toFixed(2)}</span>
+                </div>
+
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  fontSize: '0.8125rem',
+                  fontFamily: 'DM Sans',
+                  color: 'var(--text-secondary)',
+                  marginBottom: '0.75rem',
+                }}>
+                  <span>Delivery</span>
+                  <span style={{ color: 'var(--accent-cream)' }}>€{delivery.toFixed(2)}</span>
+                </div>
+
+                <div style={{
+                  borderTop: '1px solid var(--border-subtle)',
+                  paddingTop: '0.75rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  fontSize: '0.875rem',
+                  fontFamily: 'DM Sans',
+                  fontWeight: 'bold',
+                  color: 'var(--accent-cream)',
+                }}>
+                  <span>Total charged</span>
+                  <span style={{ color: 'var(--accent-amber)' }}>€{finalTotal.toFixed(2)}</span>
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div style={{
+                borderTop: '1px solid var(--border-subtle)',
+                marginBottom: '1rem',
+              }} />
+
+              {/* Delivery Details */}
+              <div style={{ marginBottom: '0.75rem' }}>
+                <div style={{
+                  fontSize: '0.8125rem',
+                  fontFamily: 'DM Sans',
+                  color: 'var(--text-secondary)',
+                  marginBottom: '0.5rem',
+                }}>
+                  Delivery address:
                 </div>
                 <p style={{
-                  fontSize: '0.95rem',
+                  fontSize: '0.8125rem',
                   fontFamily: 'DM Sans',
-                  color: 'var(--text-primary)',
-                  margin: '0.5rem 0 0 0',
+                  color: 'var(--accent-cream)',
+                  margin: 0,
                 }}>
                   {deliveryAddress}
                 </p>
@@ -420,12 +480,12 @@ export default function CheckoutPage() {
               <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                fontSize: '0.95rem',
+                fontSize: '0.8125rem',
                 fontFamily: 'DM Sans',
                 color: 'var(--text-secondary)',
               }}>
                 <span>Estimated delivery:</span>
-                <span>3-5 working days</span>
+                <span style={{ color: 'var(--accent-cream)' }}>3-5 working days</span>
               </div>
             </div>
 
@@ -1034,10 +1094,21 @@ export default function CheckoutPage() {
               fontFamily: 'DM Sans',
               fontWeight: '700',
               color: 'var(--accent-amber)',
+              marginBottom: '0.75rem',
             }}>
               <span>Total</span>
               <span>€{finalTotal.toFixed(2)}</span>
             </div>
+
+            <p style={{
+              fontSize: '0.75rem',
+              fontFamily: 'DM Sans',
+              color: 'var(--text-muted)',
+              margin: 0,
+              lineHeight: '1.4',
+            }}>
+              All prices include VAT
+            </p>
           </div>
 
           {/* Promo Code */}
