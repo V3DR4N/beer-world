@@ -91,6 +91,9 @@ export default function CheckoutPage() {
   const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const [feedbackText, setFeedbackText] = useState('');
 
+  // Order snapshot - captures basket data before clearing
+  const [orderSnapshot, setOrderSnapshot] = useState(null);
+
   // Initialize stock and check if user is already logged in on mount
   useEffect(() => {
     // Initialize stock from mock data
@@ -164,6 +167,25 @@ export default function CheckoutPage() {
 
       // Deduct stock for each item in order
       reduceStockForOrder(items);
+
+      // Save basket snapshot before clearing
+      const subtotalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const vatAmount = subtotalAmount * 0.1736;
+      const totalCharged = subtotalAmount + 4.95;
+
+      setOrderSnapshot({
+        items: items.map(item => ({
+          id: item.brewerId,
+          name: item.beerName,
+          brewer: item.breweryName,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        subtotal: subtotalAmount,
+        vat: vatAmount,
+        delivery: 4.95,
+        totalCharged: totalCharged,
+      });
 
       // Clear basket on successful order
       clearBasket();
@@ -251,7 +273,7 @@ export default function CheckoutPage() {
     return beer?.brewerId;
   };
 
-  const firstBeerBrewerId = items.length > 0 ? getBrewerName(items[0].brewerId) : null;
+  const firstBeerBrewerId = orderSnapshot && orderSnapshot.items.length > 0 ? orderSnapshot.items[0].id : null;
 
   // Scroll to top when confirmation screen loads
   useEffect(() => {
@@ -374,9 +396,9 @@ export default function CheckoutPage() {
 
               {/* Items */}
               <div style={{ marginBottom: '1.5rem' }}>
-                {items.map((item) => (
+                {orderSnapshot && orderSnapshot.items.map((item) => (
                   <div
-                    key={item.brewerId}
+                    key={item.id}
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
@@ -386,7 +408,7 @@ export default function CheckoutPage() {
                       marginBottom: '0.5rem',
                     }}
                   >
-                    <span>{item.beerName} × {item.quantity}</span>
+                    <span>{item.name} × {item.quantity}</span>
                     <span style={{ color: 'var(--accent-amber)' }}>€{(item.price * item.quantity).toFixed(2)}</span>
                   </div>
                 ))}
@@ -409,7 +431,7 @@ export default function CheckoutPage() {
                   marginBottom: '0.5rem',
                 }}>
                   <span>Subtotal</span>
-                  <span style={{ color: 'var(--accent-cream)' }}>€{subtotal.toFixed(2)}</span>
+                  <span style={{ color: 'var(--accent-cream)' }}>€{orderSnapshot ? orderSnapshot.subtotal.toFixed(2) : '0.00'}</span>
                 </div>
 
                 <div style={{
@@ -421,7 +443,7 @@ export default function CheckoutPage() {
                   marginBottom: '0.5rem',
                 }}>
                   <span>VAT included (21%)</span>
-                  <span style={{ color: 'var(--accent-cream)' }}>€{(subtotal * 0.1736).toFixed(2)}</span>
+                  <span style={{ color: 'var(--accent-cream)' }}>€{orderSnapshot ? orderSnapshot.vat.toFixed(2) : '0.00'}</span>
                 </div>
 
                 <div style={{
@@ -433,7 +455,7 @@ export default function CheckoutPage() {
                   marginBottom: '0.75rem',
                 }}>
                   <span>Delivery</span>
-                  <span style={{ color: 'var(--accent-cream)' }}>€{delivery.toFixed(2)}</span>
+                  <span style={{ color: 'var(--accent-cream)' }}>€{orderSnapshot ? orderSnapshot.delivery.toFixed(2) : '0.00'}</span>
                 </div>
 
                 <div style={{
@@ -447,7 +469,7 @@ export default function CheckoutPage() {
                   color: 'var(--accent-cream)',
                 }}>
                   <span>Total charged</span>
-                  <span style={{ color: 'var(--accent-amber)' }}>€{finalTotal.toFixed(2)}</span>
+                  <span style={{ color: 'var(--accent-amber)' }}>€{orderSnapshot ? orderSnapshot.totalCharged.toFixed(2) : '0.00'}</span>
                 </div>
               </div>
 
